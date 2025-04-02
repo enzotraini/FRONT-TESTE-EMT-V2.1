@@ -1,0 +1,4 @@
+[build]
+base = "."
+command = "CI= pnpm dev build --mode test && echo '/* /index.html  200' | cat >dist/_redirects"
+publish = "./dist/"
