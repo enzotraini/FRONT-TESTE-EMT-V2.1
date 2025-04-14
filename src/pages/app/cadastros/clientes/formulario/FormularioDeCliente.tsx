@@ -256,8 +256,8 @@ export function FormularioDeClientes() {
 
 				// Configurações
 				isentoJPI: dadosAdicionais.isentoJPI || "0",
-				percentualAumentoTeorico: dadosAdicionais.percentualAumentoTeorico ? Number(dadosAdicionais.percentualAumentoTeorico) : 0,
-				percentualPerda: dadosAdicionais.percentualPerda ? Number(dadosAdicionais.percentualPerda) : 0,
+				percentualAumentoTeorico: Number(dadosAdicionais.percentualAumentoTeorico) || 0,
+				percentualPerda: Number(dadosAdicionais.percentualPerda) || 0,
 
 				// Contatos adicionais
 				contatosAdicionais: dadosAdicionais.contatosAdicionais?.map(contato => ({

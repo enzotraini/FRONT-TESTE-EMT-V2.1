@@ -63,8 +63,8 @@ export const dadosAdicionaisFormSchema = z.object({
 		quantidade: z.coerce.number().default(0)
 	}),
 	isentoJPI: z.enum(booleanSelector).default("0"),
-	percentualAumentoTeorico: z.string().default("0"),
-	percentualPerda: z.string().default("0"),
+	percentualAumentoTeorico: z.coerce.number().default(0),
+	percentualPerda: z.coerce.number().default(0),
 	contatosAdicionais: z.array(z.object({
 		id: z.string().default("-1"),
 		contato: z.string().default(""),

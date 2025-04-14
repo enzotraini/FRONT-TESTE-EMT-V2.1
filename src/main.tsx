@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { routes } from "./routes";
 import "./styles/global.css";
 import { enableMSW } from "./api/mocks/index.ts";
+import { ThemeProvider } from "./components/theme-provider";
 
 console.log("Iniciando aplicação...");
 
@@ -24,9 +25,11 @@ enableMSW().then(() => {
 	
 	ReactDOM.createRoot(root).render(
 		<React.StrictMode>
-			<QueryClientProvider client={queryClient}>
-				<RouterProvider router={routes} />
-			</QueryClientProvider>
+			<ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
+				<QueryClientProvider client={queryClient}>
+					<RouterProvider router={routes} />
+				</QueryClientProvider>
+			</ThemeProvider>
 		</React.StrictMode>,
 	);
 });

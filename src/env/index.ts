@@ -6,7 +6,7 @@ const envSchema = z.object({
 		.string()
 		.refine((value) => value === "true" || value === "false")
 		.transform((value) => value === "true"),
-	MODE: z.enum(["production", "development", "test"]),
+	VITE_MODE: z.enum(["production", "development", "test"]),
 });
 
 export const env = envSchema.parse(import.meta.env);

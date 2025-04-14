@@ -81,7 +81,11 @@ export function SignUp() {
 		onError: (error) => {
 			console.error("Erro ao criar usuário:", error);
 			if (error instanceof AxiosError) {
-				toast.error(error.response?.data.message);
+				if (error.response?.status === 400) {
+					toast.error(error.response.data.message || "Email já está em uso");
+				} else {
+					toast.error(error.response?.data.message || "Erro ao criar usuário");
+				}
 				return;
 			}
 

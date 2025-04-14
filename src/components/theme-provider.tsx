@@ -31,6 +31,7 @@ export function ThemeProvider({
 	);
 
 	useEffect(() => {
+		console.log("[ThemeProvider] Aplicando tema:", theme);
 		const root = window.document.documentElement;
 
 		root.classList.remove("light", "dark");
@@ -40,17 +41,25 @@ export function ThemeProvider({
 				.matches
 				? "dark"
 				: "light";
-
+			
+			console.log("[ThemeProvider] Tema do sistema detectado:", systemTheme);
 			root.classList.add(systemTheme);
 			return;
 		}
 
+		console.log("[ThemeProvider] Adicionando classe:", theme);
 		root.classList.add(theme);
+		
+		// Forçar uma re-renderização para garantir que as classes CSS sejam aplicadas
+		document.body.style.display = 'none';
+		document.body.offsetHeight; // Força um reflow
+		document.body.style.display = '';
 	}, [theme]);
 
 	const value = {
 		theme,
 		setTheme: (theme: Theme) => {
+			console.log("[ThemeProvider] Definindo tema:", theme);
 			localStorage.setItem(storageKey, theme);
 			setTheme(theme);
 		},

@@ -180,7 +180,7 @@ export function SignIn() {
 					</Link>
 					<div>
 						Não tem uma conta?{" "}
-						<Link to="/sign-up" className="text-blue-700 dark:text-blue-400 hover:underline">
+						<Link to="/auth/sign-up" className="text-blue-700 dark:text-blue-400 hover:underline">
 							Criar conta
 						</Link>
 					</div>

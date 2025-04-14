@@ -1,27 +1,31 @@
 import React from "react";
-import ReactDOM from "react-dom/client";
-import { RouterProvider } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { routes } from "./routes";
-import "./styles/global.css";
-import { enableMSW } from "./api/mocks/index.ts";
 import { Toaster } from "sonner";
 import { ThemeProvider } from "./components/theme-provider";
-
-console.log("Iniciando aplicação...");
+import { AppLayout } from "./pages/_layouts/AppLayout";
+import { isAuthenticated } from "./routes";
 
 const queryClient = new QueryClient();
 
-function App() {
-	console.log("Renderizando App...");
+export default function App() {
+	const location = useLocation();
+	const isAuth = isAuthenticated();
+	const isPublicRoute = location.pathname.startsWith('/entrada-mercadoria') || 
+		location.pathname.startsWith('/pedidos/compras');
+
 	return (
 		<ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
 			<QueryClientProvider client={queryClient}>
 				<Toaster richColors closeButton />
-				<RouterProvider router={routes} />
+				{isAuth || isPublicRoute ? (
+					<AppLayout>
+						<Outlet />
+					</AppLayout>
+				) : (
+					<Outlet />
+				)}
 			</QueryClientProvider>
 		</ThemeProvider>
 	);
 }
-
-export default App;

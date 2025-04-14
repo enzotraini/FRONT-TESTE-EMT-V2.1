@@ -10,6 +10,8 @@ import { Clientes } from "@/pages/app/cadastros/clientes/Clientes";
 import { FormularioDeClientes } from "@/pages/app/cadastros/clientes/formulario/FormularioDeCliente";
 import { Transportadoras } from "@/pages/cadastros/transportadoras/Transportadoras";
 import { FormularioDeTransportadora } from "@/pages/cadastros/transportadoras/formulario/FormularioDeTransportadora";
+import { EntradaDeMercadoria } from "@/pages/cadastros/entrada-mercadoria/EntradaDeMercadoria";
+import { FormularioDeEntradaDeMercadoria } from "@/pages/cadastros/entrada-mercadoria/formulario/FormularioDeEntradaDeMercadoria";
 
 export const routes = createBrowserRouter([
 	{
@@ -62,6 +64,24 @@ export const routes = createBrowserRouter([
 							{
 								path: ":id",
 								element: <FormularioDeTransportadora />,
+							},
+						],
+					},
+					{
+						path: "entrada-mercadoria",
+						element: <Outlet />,
+						children: [
+							{
+								path: "",
+								element: <EntradaDeMercadoria />,
+							},
+							{
+								path: "nova",
+								element: <FormularioDeEntradaDeMercadoria />,
+							},
+							{
+								path: ":id",
+								element: <FormularioDeEntradaDeMercadoria />,
 							},
 						],
 					},

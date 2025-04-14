@@ -1,4 +1,4 @@
-import { createBrowserRouter, Navigate, useNavigate, useLocation } from "react-router-dom";
+import { createBrowserRouter, Navigate, useNavigate, useLocation, Outlet } from "react-router-dom";
 import App from "../App";
 import { Dashboard } from "../pages/Dashboard";
 import { AuthLayout } from "../pages/_layouts/AuthLayout";
@@ -15,6 +15,8 @@ import { Clientes } from "../pages/app/cadastros/clientes/Clientes";
 import { FormularioDeCliente } from "../pages/app/cadastros/clientes/formulario/FormularioDeCliente";
 import { TabsList, TabsTrigger } from "../components/ui/tabs";
 import { cn } from "../lib/utils";
+import { RegistrarEntradaPage } from "../pages/entrada-mercadoria/registrar";
+import { ComprasPage } from "../pages/pedidos/compras/ComprasPage";
 
 console.log("[ROUTER] Iniciando configuração de rotas...");
 
@@ -127,96 +129,106 @@ const router = createBrowserRouter([
 				],
 			},
 			{
-				path: "app",
-				element: <ProtectedRoute><AppLayout /></ProtectedRoute>,
+				path: "entrada-mercadoria",
 				children: [
 					{
 						path: "",
-						element: <Navigate to="/dashboard" replace />,
-					},
-					{
-						path: "dashboard",
-						element: <Dashboard />,
-					},
-					{
-						path: "cadastros",
-						children: [
-							{
-								path: "clientes",
-								element: <Clientes />,
-							},
-							{
-								path: "clientes/novo",
-								element: <FormularioDeCliente />,
-							},
-							{
-								path: "clientes/:id",
-								element: <FormularioDeCliente />,
-							},
-							{
-								path: "transportadoras",
-								element: (
-									console.log("[ROUTER] Tentando renderizar componente Transportadoras"),
-									<Transportadoras />
-								),
-							},
-							{
-								path: "transportadoras/novo",
-								element: <FormularioDeTransportadora />,
-							},
-							{
-								path: "transportadoras/:id",
-								element: <FormularioDeTransportadora />,
-							},
-						],
-					},
-					{
-						path: "atendimento-ao-cliente",
-						element: <div>Atendimento ao Cliente</div>,
-					},
-					{
-						path: "pedidos",
-						children: [
-							{
-								path: "vendas",
-								element: <div>Vendas</div>,
-							},
-							{
-								path: "compras",
-								element: <div>Compras</div>,
-							},
-						],
-					},
-					{
-						path: "nota-fiscal",
-						element: <div>Nota Fiscal</div>,
-					},
-					{
-						path: "entrada-de-mercadoria",
 						element: <div>Entrada de Mercadoria</div>,
 					},
 					{
-						path: "ficha-kardex",
-						element: <div>Ficha Kardex</div>,
+						path: "registrar",
+						element: <RegistrarEntradaPage />,
 					},
 					{
-						path: "contas",
-						children: [
-							{
-								path: "receber",
-								element: <div>Contas a Receber</div>,
-							},
-							{
-								path: "pagar",
-								element: <div>Contas a Pagar</div>,
-							},
-						],
+						path: "substituicao",
+						element: <div>Entrada de Substituição</div>,
 					},
 					{
-						path: "expedicao",
-						element: <div>Expedição</div>,
+						path: "consultar",
+						element: <div>Consultar Entradas</div>,
 					},
 				],
+			},
+			{
+				path: "dashboard",
+				element: <ProtectedRoute><Dashboard /></ProtectedRoute>,
+			},
+			{
+				path: "cadastros",
+				element: <ProtectedRoute><Outlet /></ProtectedRoute>,
+				children: [
+					{
+						path: "clientes",
+						element: <Clientes />,
+					},
+					{
+						path: "clientes/novo",
+						element: <FormularioDeCliente />,
+					},
+					{
+						path: "clientes/:id",
+						element: <FormularioDeCliente />,
+					},
+					{
+						path: "transportadoras",
+						element: (
+							console.log("[ROUTER] Tentando renderizar componente Transportadoras"),
+							<Transportadoras />
+						),
+					},
+					{
+						path: "transportadoras/novo",
+						element: <FormularioDeTransportadora />,
+					},
+					{
+						path: "transportadoras/:id",
+						element: <FormularioDeTransportadora />,
+					},
+				],
+			},
+			{
+				path: "pedidos",
+				element: <ProtectedRoute><Outlet /></ProtectedRoute>,
+				children: [
+					{
+						path: "compras",
+						element: <ComprasPage />,
+					},
+					{
+						path: "vendas",
+						element: <div>Vendas</div>,
+					},
+				],
+			},
+			{
+				path: "atendimento-ao-cliente",
+				element: <ProtectedRoute><div>Atendimento ao Cliente</div></ProtectedRoute>,
+			},
+			{
+				path: "nota-fiscal",
+				element: <ProtectedRoute><div>Nota Fiscal</div></ProtectedRoute>,
+			},
+			{
+				path: "ficha-kardex",
+				element: <ProtectedRoute><div>Ficha Kardex</div></ProtectedRoute>,
+			},
+			{
+				path: "contas",
+				element: <ProtectedRoute><Outlet /></ProtectedRoute>,
+				children: [
+					{
+						path: "receber",
+						element: <div>Contas a Receber</div>,
+					},
+					{
+						path: "pagar",
+						element: <div>Contas a Pagar</div>,
+					},
+				],
+			},
+			{
+				path: "expedicao",
+				element: <ProtectedRoute><div>Expedição</div></ProtectedRoute>,
 			},
 			{
 				path: "*",

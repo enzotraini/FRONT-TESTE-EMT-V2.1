@@ -8,11 +8,20 @@ export const authenticateMock = http.post<never, AuthenticateBody>(
 		await applyDelay();
 		const { email, senha } = await request.json();
 		if (email === "example@email.com" && senha === "123456") {
-			return HttpResponse.json(null, { status: 200 });
+			// Simula um token JWT com os IDs necessários
+			const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwib3JnIjoiMSJ9.signature";
+			
+			// Define o cookie com o token
+			return new HttpResponse(null, {
+				status: 204,
+				headers: {
+					"Set-Cookie": `auth_token=${token}; Path=/; HttpOnly; SameSite=Strict`
+				}
+			});
 		}
 
 		return HttpResponse.json(
-			{ message: "Crendeciais inválidas" },
+			{ message: "Credenciais inválidas" },
 			{ status: 401 },
 		);
 	},

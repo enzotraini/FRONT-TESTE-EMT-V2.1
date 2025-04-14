@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
 	Sidebar,
 	SidebarContent,
@@ -33,6 +33,20 @@ import {
 	Ticket,
 	User,
 	User2,
+	FileText,
+	ClipboardList,
+	PackageSearch,
+	Boxes,
+	ClipboardCheck,
+	PackageOpen,
+	BarChart3,
+	Truck,
+	DollarSign,
+	PackageCheck,
+	Route,
+	Calculator,
+	LineChart,
+	Package,
 } from "lucide-react";
 import { Button } from "./ui/button";
 import {
@@ -47,12 +61,37 @@ import {
 	DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { useTheme } from "./theme-provider";
+import { useMutation } from "@tanstack/react-query";
+import { logout } from "@/api/usuario/logout";
+import { toast } from "sonner";
 
 const linkClassName =
 	"peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-8 text-sm";
 
 export function AppSidebar() {
 	const { setTheme } = useTheme();
+	const navigate = useNavigate();
+
+	const { mutateAsync: logoutFn } = useMutation({
+		mutationFn: logout,
+		onSuccess: () => {
+			console.log("[AppSidebar] Logout realizado com sucesso");
+			toast.success("Logout realizado com sucesso!");
+			navigate("/auth/sign-in");
+		},
+		onError: (error) => {
+			console.error("[AppSidebar] Erro ao fazer logout:", error);
+			toast.error("Erro ao fazer logout. Tente novamente.");
+		},
+	});
+
+	const handleLogout = async () => {
+		try {
+			await logoutFn();
+		} catch (error) {
+			console.error("[AppSidebar] Erro ao fazer logout:", error);
+		}
+	};
 
 	return (
 		<Sidebar>
@@ -108,20 +147,28 @@ export function AppSidebar() {
 						<SidebarGroup>
 							<SidebarMenuButton asChild>
 								<CollapsibleTrigger>
-									<List /> Pedidos
+									<ShoppingCart /> Pedidos
 									<ChevronDown className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180" />
 								</CollapsibleTrigger>
 							</SidebarMenuButton>
 							<CollapsibleContent>
 								<SidebarGroupContent>
 									<SidebarMenuButton asChild>
-										<Link to="/pedidos/vendas">
-											<SidebarMenuItem>Vendas</SidebarMenuItem>
+										<Link
+											to="/pedidos/compras"
+											className="flex items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-accent"
+										>
+											<ShoppingCart className="h-4 w-4" />
+											Compras
 										</Link>
 									</SidebarMenuButton>
 									<SidebarMenuButton asChild>
-										<Link to="/pedidos/compras">
-											<SidebarMenuItem>Compras</SidebarMenuItem>
+										<Link
+											to="/pedidos/vendas"
+											className="flex items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-accent"
+										>
+											<ShoppingCart className="h-4 w-4" />
+											Vendas
 										</Link>
 									</SidebarMenuButton>
 								</SidebarGroupContent>
@@ -129,29 +176,107 @@ export function AppSidebar() {
 						</SidebarGroup>
 					</Collapsible>
 
-					<SidebarMenuButton asChild>
-						<Link to="/nota-fiscal">
-							<SidebarMenuItem className={linkClassName}>
-								<File /> Nota fiscal
-							</SidebarMenuItem>
-						</Link>
-					</SidebarMenuButton>
+					<Collapsible className="group/collapsible">
+						<SidebarGroup>
+							<SidebarMenuButton asChild>
+								<CollapsibleTrigger>
+									<FileText /> Nota Fiscal
+									<ChevronDown className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180" />
+								</CollapsibleTrigger>
+							</SidebarMenuButton>
+							<CollapsibleContent>
+								<SidebarGroupContent>
+									<SidebarMenuButton asChild>
+										<Link to="/nota-fiscal/emissao">
+											<SidebarMenuItem>Emissão de NF</SidebarMenuItem>
+										</Link>
+									</SidebarMenuButton>
+									<SidebarMenuButton asChild>
+										<Link to="/nota-fiscal/controle">
+											<SidebarMenuItem>Controle de Notas</SidebarMenuItem>
+										</Link>
+									</SidebarMenuButton>
+									<SidebarMenuButton asChild>
+										<Link to="/nota-fiscal/consulta">
+											<SidebarMenuItem>Consulta NF-e</SidebarMenuItem>
+										</Link>
+									</SidebarMenuButton>
+								</SidebarGroupContent>
+							</CollapsibleContent>
+						</SidebarGroup>
+					</Collapsible>
 
-					<SidebarMenuButton asChild>
-						<Link to="/entrada-de-mercadoria">
-							<SidebarMenuItem className={linkClassName}>
-								<ShoppingCart /> Entrada de Mercadoria
-							</SidebarMenuItem>
-						</Link>
-					</SidebarMenuButton>
+					<Collapsible className="group/collapsible">
+						<SidebarGroup>
+							<SidebarMenuButton asChild>
+								<CollapsibleTrigger>
+									<PackageOpen /> Entrada de Mercadoria
+									<ChevronDown className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180" />
+								</CollapsibleTrigger>
+							</SidebarMenuButton>
+							<CollapsibleContent>
+								<SidebarGroupContent>
+									<SidebarMenuButton asChild>
+										<Link
+											to="/cadastros/entrada-mercadoria/nova"
+											className="flex items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-accent"
+										>
+											<Package className="h-4 w-4" />
+											Registrar Entrada
+										</Link>
+									</SidebarMenuButton>
+									<SidebarMenuButton asChild>
+										<Link
+											to="/cadastros/entrada-mercadoria/substituicao"
+											className="flex items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-accent"
+										>
+											<Package className="h-4 w-4" />
+											Entrada de Substituição
+										</Link>
+									</SidebarMenuButton>
+									<SidebarMenuButton asChild>
+										<Link
+											to="/cadastros/entrada-mercadoria/consulta"
+											className="flex items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-accent"
+										>
+											<Package className="h-4 w-4" />
+											Consultar Entradas
+										</Link>
+									</SidebarMenuButton>
+								</SidebarGroupContent>
+							</CollapsibleContent>
+						</SidebarGroup>
+					</Collapsible>
 
-					<SidebarMenuButton asChild>
-						<Link to="/ficha-kardex">
-							<SidebarMenuItem className={linkClassName}>
-								<Ticket /> Ficha Kardex
-							</SidebarMenuItem>
-						</Link>
-					</SidebarMenuButton>
+					<Collapsible className="group/collapsible">
+						<SidebarGroup>
+							<SidebarMenuButton asChild>
+								<CollapsibleTrigger>
+									<BarChart3 /> Ficha Kardex
+									<ChevronDown className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180" />
+								</CollapsibleTrigger>
+							</SidebarMenuButton>
+							<CollapsibleContent>
+								<SidebarGroupContent>
+									<SidebarMenuButton asChild>
+										<Link to="/ficha-kardex/materia-prima">
+											<SidebarMenuItem>Kardex Matéria Prima</SidebarMenuItem>
+										</Link>
+									</SidebarMenuButton>
+									<SidebarMenuButton asChild>
+										<Link to="/ficha-kardex/produtos">
+											<SidebarMenuItem>Kardex Produtos</SidebarMenuItem>
+										</Link>
+									</SidebarMenuButton>
+									<SidebarMenuButton asChild>
+										<Link to="/ficha-kardex/listagem">
+											<SidebarMenuItem>Listagem Estoque</SidebarMenuItem>
+										</Link>
+									</SidebarMenuButton>
+								</SidebarGroupContent>
+							</CollapsibleContent>
+						</SidebarGroup>
+					</Collapsible>
 
 					<Collapsible className="group/collapsible">
 						<SidebarGroup>
@@ -178,21 +303,65 @@ export function AppSidebar() {
 						</SidebarGroup>
 					</Collapsible>
 
-					<SidebarMenuButton asChild>
-						<Link to="/expedicao">
-							<SidebarMenuItem className={linkClassName}>
-								<MapIcon /> Expedição
-							</SidebarMenuItem>
-						</Link>
-					</SidebarMenuButton>
+					<Collapsible className="group/collapsible">
+						<SidebarGroup>
+							<SidebarMenuButton asChild>
+								<CollapsibleTrigger>
+									<Truck /> Expedição
+									<ChevronDown className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180" />
+								</CollapsibleTrigger>
+							</SidebarMenuButton>
+							<CollapsibleContent>
+								<SidebarGroupContent>
+									<SidebarMenuButton asChild>
+										<Link to="/expedicao/romaneio">
+											<SidebarMenuItem>Romaneio</SidebarMenuItem>
+										</Link>
+									</SidebarMenuButton>
+									<SidebarMenuButton asChild>
+										<Link to="/expedicao/entregas">
+											<SidebarMenuItem>Controle de Entregas</SidebarMenuItem>
+										</Link>
+									</SidebarMenuButton>
+									<SidebarMenuButton asChild>
+										<Link to="/expedicao/rotas">
+											<SidebarMenuItem>Rotas</SidebarMenuItem>
+										</Link>
+									</SidebarMenuButton>
+								</SidebarGroupContent>
+							</CollapsibleContent>
+						</SidebarGroup>
+					</Collapsible>
 
-					<SidebarMenuButton asChild>
-						<Link to="/preco-e-estoque">
-							<SidebarMenuItem className={linkClassName}>
-								<Box /> Preço e Estoque
-							</SidebarMenuItem>
-						</Link>
-					</SidebarMenuButton>
+					<Collapsible className="group/collapsible">
+						<SidebarGroup>
+							<SidebarMenuButton asChild>
+								<CollapsibleTrigger>
+									<Calculator /> Preço e Estoque
+									<ChevronDown className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180" />
+								</CollapsibleTrigger>
+							</SidebarMenuButton>
+							<CollapsibleContent>
+								<SidebarGroupContent>
+									<SidebarMenuButton asChild>
+										<Link to="/preco-estoque/tabela">
+											<SidebarMenuItem>Tabela de Preços</SidebarMenuItem>
+										</Link>
+									</SidebarMenuButton>
+									<SidebarMenuButton asChild>
+										<Link to="/preco-estoque/cotacoes">
+											<SidebarMenuItem>Cotações</SidebarMenuItem>
+										</Link>
+									</SidebarMenuButton>
+									<SidebarMenuButton asChild>
+										<Link to="/preco-estoque/analise">
+											<SidebarMenuItem>Análise de Estoque</SidebarMenuItem>
+										</Link>
+									</SidebarMenuButton>
+								</SidebarGroupContent>
+							</CollapsibleContent>
+						</SidebarGroup>
+					</Collapsible>
 				</SidebarMenu>
 			</SidebarContent>
 			<SidebarFooter>
@@ -223,19 +392,40 @@ export function AppSidebar() {
 										</span>
 									</DropdownMenuSubTrigger>
 									<DropdownMenuSubContent>
-										<DropdownMenuItem onClick={() => setTheme("light")}>
+										<DropdownMenuItem 
+											onSelect={() => {
+												console.log("[AppSidebar] Tentando mudar para tema claro");
+												setTheme("light");
+												console.log("[AppSidebar] Tema claro definido");
+												toast.success("Tema claro ativado");
+											}}
+										>
 											<span>Claro</span>
 										</DropdownMenuItem>
-										<DropdownMenuItem onClick={() => setTheme("dark")}>
+										<DropdownMenuItem 
+											onSelect={() => {
+												console.log("[AppSidebar] Tentando mudar para tema escuro");
+												setTheme("dark");
+												console.log("[AppSidebar] Tema escuro definido");
+												toast.success("Tema escuro ativado");
+											}}
+										>
 											<span>Escuro</span>
 										</DropdownMenuItem>
-										<DropdownMenuItem onClick={() => setTheme("system")}>
+										<DropdownMenuItem 
+											onSelect={() => {
+												console.log("[AppSidebar] Tentando mudar para tema do sistema");
+												setTheme("system");
+												console.log("[AppSidebar] Tema do sistema definido");
+												toast.success("Tema do sistema ativado");
+											}}
+										>
 											<span>Sistema</span>
 										</DropdownMenuItem>
 									</DropdownMenuSubContent>
 								</DropdownMenuSub>
 								<DropdownMenuSeparator />
-								<DropdownMenuItem>
+								<DropdownMenuItem onClick={handleLogout}>
 									<span className="flex gap-2 items-center justify-center">
 										<Power /> Sair
 									</span>
