@@ -28,12 +28,13 @@ async function checkBackendAvailability() {
 	}
 }
 
-export const api = axios.create({
-	baseURL: env.VITE_API_URL,
+const api = axios.create({
+	baseURL: import.meta.env.VITE_API_URL,
 	withCredentials: true,
 	headers: {
-		"Content-Type": "application/json",
-		"Accept": "application/json",
+		'Content-Type': 'application/json',
+		'Accept': 'application/json',
+		'Origin': window.location.origin,
 	},
 	validateStatus: (status) => {
 		return status >= 200 && status < 300;
@@ -42,6 +43,36 @@ export const api = axios.create({
 	xsrfHeaderName: undefined,
 	timeout: 15000, // Aumentado para 15 segundos
 });
+
+// Exportando a variável api para que possa ser importada em outros arquivos
+export { api };
+
+// Função para verificar se os cookies foram definidos
+function checkCookies() {
+	const cookies = document.cookie.split(';').map(cookie => cookie.trim());
+	const hasAuthCheck = cookies.some(cookie => cookie.startsWith('auth_check='));
+	console.log("[axios] Verificando cookies:", {
+		cookies,
+		hasAuthCheck,
+		allCookies: document.cookie
+	});
+	return hasAuthCheck;
+}
+
+// Função para aguardar os cookies serem definidos
+async function waitForCookies(maxAttempts = 20, interval = 200) {
+	console.log("[axios] Iniciando espera por cookies...");
+	for (let i = 0; i < maxAttempts; i++) {
+		if (checkCookies()) {
+			console.log("[axios] Cookies encontrados na tentativa", i + 1);
+			return true;
+		}
+		console.log("[axios] Tentativa", i + 1, "de", maxAttempts);
+		await new Promise(resolve => setTimeout(resolve, interval));
+	}
+	console.log("[axios] Timeout esperando cookies");
+	return false;
+}
 
 // Interceptor para adicionar headers em cada requisição
 api.interceptors.request.use(
@@ -53,13 +84,10 @@ api.interceptors.request.use(
 			withCredentials: config.withCredentials,
 			data: config.data,
 		});
-
-		// Verifica se o backend está disponível antes de cada requisição
-		const isAvailable = await checkBackendAvailability();
-		if (!isAvailable) {
-			throw new Error("Backend não está disponível");
-		}
-
+		
+		// Adiciona o header Origin para requisições cross-origin
+		config.headers['Origin'] = window.location.origin;
+		
 		return config;
 	},
 	(error) => {

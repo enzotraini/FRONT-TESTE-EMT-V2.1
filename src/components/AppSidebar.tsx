@@ -64,6 +64,7 @@ import { useTheme } from "./theme-provider";
 import { useMutation } from "@tanstack/react-query";
 import { logout } from "@/api/usuario/logout";
 import { toast } from "sonner";
+import { redirectTo } from "@/utils/navigation";
 
 const linkClassName =
 	"peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-8 text-sm";
@@ -77,7 +78,6 @@ export function AppSidebar() {
 		onSuccess: () => {
 			console.log("[AppSidebar] Logout realizado com sucesso");
 			toast.success("Logout realizado com sucesso!");
-			navigate("/auth/sign-in");
 		},
 		onError: (error) => {
 			console.error("[AppSidebar] Erro ao fazer logout:", error);
@@ -88,8 +88,10 @@ export function AppSidebar() {
 	const handleLogout = async () => {
 		try {
 			await logoutFn();
+			redirectTo("/auth/sign-in");
 		} catch (error) {
 			console.error("[AppSidebar] Erro ao fazer logout:", error);
+			redirectTo("/auth/sign-in");
 		}
 	};
 

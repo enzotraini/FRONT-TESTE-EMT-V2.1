@@ -11,7 +11,7 @@ export interface AuthenticateResponse {
 }
 
 // Função para verificar se os cookies foram definidos
-async function waitForCookies(maxAttempts = 10, interval = 100): Promise<boolean> {
+async function waitForCookies(maxAttempts = 30, interval = 200): Promise<boolean> {
 	console.log("[authenticate] Aguardando cookies serem definidos...");
 	
 	for (let i = 0; i < maxAttempts; i++) {

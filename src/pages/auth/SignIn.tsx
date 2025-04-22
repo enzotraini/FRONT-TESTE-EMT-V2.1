@@ -68,11 +68,19 @@ export function SignIn() {
 				return;
 			}
 			
+			// Verifica especificamente o cookie auth_check
+			const hasAuthCheck = document.cookie.includes('auth_check=true');
+			if (!hasAuthCheck) {
+				console.error("[SignIn] Cookie auth_check não encontrado");
+				toast.error("Erro ao fazer login: autenticação incompleta");
+				return;
+			}
+			
 			toast.success("Login realizado com sucesso!");
 			
 			// Navega para a rota principal protegida após um pequeno delay
 			console.log("[SignIn] Aguardando antes de navegar...");
-			await new Promise(resolve => setTimeout(resolve, 2000)); // Aumentado para 2 segundos
+			await new Promise(resolve => setTimeout(resolve, 1000));
 			
 			console.log("[SignIn] Cookies antes da navegação:", document.cookie);
 			console.log("[SignIn] Navegando para a rota principal...");
@@ -97,10 +105,12 @@ export function SignIn() {
 				} else if (error.message === "Network Error") {
 					toast.error("Erro de conexão com o servidor. Verifique se o backend está rodando.");
 				} else if (error.message.includes("cookies")) {
-					toast.error("Erro ao definir cookies de autenticação");
+					toast.error("Erro ao definir cookies de autenticação. Verifique se os cookies estão habilitados no navegador.");
 				} else {
 					toast.error("Erro ao fazer login. Tente novamente.");
 				}
+			} else {
+				toast.error("Erro desconhecido ao fazer login. Tente novamente.");
 			}
 		},
 	});
@@ -114,7 +124,6 @@ export function SignIn() {
 			await authenticateFn(data);
 		} catch (error) {
 			console.error("[SignIn] Erro ao fazer login:", error);
-			// Não precisa mostrar toast aqui pois já é mostrado no onError do mutation
 		}
 	};
 
