@@ -73,6 +73,8 @@ export interface CriarClienteParams {
 		email: string;
 	}>;
 	observacoesGerais?: string;
+	user_id: number;
+	organizacao_id: number;
 }
 
 export async function criarCliente(params: CriarClienteParams) {

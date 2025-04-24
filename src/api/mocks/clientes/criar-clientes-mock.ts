@@ -28,19 +28,23 @@ export const criarClienteMock = http.post<
 		const body = await request.json() as CriarClienteParams;
 		console.log("[Mock] Dados recebidos:", JSON.stringify(body, null, 2));
 		
-		// Verificar se os campos percentuais são números
-		if (typeof body.percentualAumentoTeorico !== 'number') {
-			console.error("[Mock] percentualAumentoTeorico não é um número:", body.percentualAumentoTeorico);
+		// Converter os valores percentuais para números
+		const percentualAumentoTeoricoNum = Number(body.percentualAumentoTeorico);
+		const percentualPerdaNum = Number(body.percentualPerda);
+		
+		// Verificar se os campos percentuais são números válidos
+		if (isNaN(percentualAumentoTeoricoNum)) {
+			console.error("[Mock] percentualAumentoTeorico inválido:", body.percentualAumentoTeorico);
 			return HttpResponse.json(
-				{ message: "percentualAumentoTeorico deve ser um número" },
+				{ message: "percentualAumentoTeorico deve ser um número válido" },
 				{ status: 500 }
 			);
 		}
 		
-		if (typeof body.percentualPerda !== 'number') {
-			console.error("[Mock] percentualPerda não é um número:", body.percentualPerda);
+		if (isNaN(percentualPerdaNum)) {
+			console.error("[Mock] percentualPerda inválido:", body.percentualPerda);
 			return HttpResponse.json(
-				{ message: "percentualPerda deve ser um número" },
+				{ message: "percentualPerda deve ser um número válido" },
 				{ status: 500 }
 			);
 		}
@@ -84,8 +88,8 @@ export const criarClienteMock = http.post<
 				contatosAdicionais: body.contatosAdicionais,
 				isentoJPI: body.isentoJPI,
 				observacoesGerais: body.observacoesGerais,
-				percentualAumentoTeorico: body.percentualAumentoTeorico,
-				percentualPerda: body.percentualPerda,
+				percentualAumentoTeorico: percentualAumentoTeoricoNum,
+				percentualPerda: percentualPerdaNum,
 				vendedor1: body.vendedor1,
 				vendedor2: body.vendedor2,
 				vendedor3: body.vendedor3,

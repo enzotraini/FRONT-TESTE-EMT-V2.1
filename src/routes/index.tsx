@@ -17,6 +17,7 @@ import { TabsList, TabsTrigger } from "../components/ui/tabs";
 import { cn } from "../lib/utils";
 import { RegistrarEntradaPage } from "../pages/entrada-mercadoria/registrar";
 import { ComprasPage } from "../pages/pedidos/compras/ComprasPage";
+import ConfiguracoesPage from "../pages/configuracoes";
 
 console.log("[ROUTER] Iniciando configuração de rotas...");
 
@@ -229,6 +230,10 @@ const router = createBrowserRouter([
 			{
 				path: "expedicao",
 				element: <ProtectedRoute><div>Expedição</div></ProtectedRoute>,
+			},
+			{
+				path: "configuracoes",
+				element: <ProtectedRoute><ConfiguracoesPage /></ProtectedRoute>,
 			},
 			{
 				path: "*",

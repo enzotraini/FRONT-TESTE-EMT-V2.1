@@ -12,6 +12,7 @@ import { Transportadoras } from "@/pages/cadastros/transportadoras/Transportador
 import { FormularioDeTransportadora } from "@/pages/cadastros/transportadoras/formulario/FormularioDeTransportadora";
 import { EntradaDeMercadoria } from "@/pages/cadastros/entrada-mercadoria/EntradaDeMercadoria";
 import { FormularioDeEntradaDeMercadoria } from "@/pages/cadastros/entrada-mercadoria/formulario/FormularioDeEntradaDeMercadoria";
+import { ConfiguracoesPage } from "@/pages/configuracoes";
 
 export const routes = createBrowserRouter([
 	{
@@ -86,6 +87,10 @@ export const routes = createBrowserRouter([
 						],
 					},
 				],
+			},
+			{
+				path: "/configuracoes",
+				element: <ConfiguracoesPage />,
 			},
 		],
 	},

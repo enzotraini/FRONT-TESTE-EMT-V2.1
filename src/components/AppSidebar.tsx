@@ -380,10 +380,12 @@ export function AppSidebar() {
 								side="top"
 								className="w-[--radix-popper-anchor-width]"
 							>
-								<DropdownMenuItem>
-									<span className="flex gap-2 items-center justify-center">
-										<Settings /> Configurações
-									</span>
+								<DropdownMenuItem asChild>
+									<Link to="/configuracoes">
+										<span className="flex gap-2 items-center justify-center">
+											<Settings /> Configurações
+										</span>
+									</Link>
 								</DropdownMenuItem>
 								<DropdownMenuSub>
 									<DropdownMenuSubTrigger asChild>

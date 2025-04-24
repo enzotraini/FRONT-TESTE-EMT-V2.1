@@ -20,12 +20,12 @@ const worker = setupWorker(
 );
 
 export async function enableMSW() {
-	// Ativar MSW em modo de desenvolvimento e teste
-	if (env.VITE_MODE !== "test" && env.VITE_MODE !== "development") {
-		return;
+	// Ativar MSW apenas em modo de teste
+	if (env.VITE_MODE === "test") {
+		console.log("[MSW] Iniciando em modo:", env.VITE_MODE);
+		await worker.start();
+		console.log("[MSW] Worker iniciado com sucesso");
+	} else {
+		console.log("[MSW] MSW desativado no modo:", env.VITE_MODE);
 	}
-	
-	console.log("[MSW] Iniciando em modo:", env.VITE_MODE);
-	await worker.start();
-	console.log("[MSW] Worker iniciado com sucesso");
 }

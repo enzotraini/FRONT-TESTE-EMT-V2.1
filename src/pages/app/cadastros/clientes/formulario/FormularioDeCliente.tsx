@@ -189,110 +189,103 @@ export function FormularioDeClientes() {
 		});
 
 		try {
+			// Preparar dados no formato que o backend espera
 			const dadosBase = {
 				// Dados Gerais
-				codigo: dadosGerais.codigo || "",
+				codigo: dadosGerais.codigo || String(Date.now()),
 				nome: dadosGerais.nome,
-				tipo: dadosGerais.tipo,
+				tipo: dadosGerais.tipo, // Mantendo como string ('fisica' ou 'juridica')
 				identificador: dadosGerais.identificador.replace(/\D/g, ""),
 				
 				// Endereço
 				cep: dadosGerais.cep.replace(/\D/g, ""),
 				rua: dadosGerais.rua,
-				numero: dadosGerais.numero ? Number(dadosGerais.numero) : undefined,
-				complemento: dadosGerais.complemento || undefined,
+				numero: Number(dadosGerais.numero) || 0,
+				complemento: dadosGerais.complemento || "",
 				bairro: dadosGerais.bairro,
 				cidade: dadosGerais.cidade,
 				estado: dadosGerais.estado,
-				ie: dadosGerais.ie ? Number(dadosGerais.ie) : undefined,
-				isuframa: dadosGerais.isuframa || undefined,
-				nomeFantasia: dadosGerais.nomeFantasia || undefined,
-				tipoConsumo: "1" as const,
-				contribuinteICMS: "1" as const,
-
+				
+				// Dados fiscais
+				ie: Number(dadosGerais.ie?.replace(/\D/g, "")) || 0,
+				contribuinteICMS: "1", // Valor fixo conforme schema
+				isuframa: dadosGerais.isuframa || "",
+				nomeFantasia: dadosGerais.nomeFantasia || "",
+				tipoConsumo: "1", // Valor fixo conforme schema
+				
 				// Praça de pagamento
 				pracaCep: dadosGerais.pracaCep.replace(/\D/g, ""),
 				pracaRua: dadosGerais.pracaRua,
-				pracaNumero: dadosGerais.pracaNumero ? Number(dadosGerais.pracaNumero) : undefined,
-				pracaComplemento: dadosGerais.pracaComplemento || undefined,
+				pracaNumero: Number(dadosGerais.pracaNumero) || 0,
+				pracaComplemento: dadosGerais.pracaComplemento || "",
 				pracaBairro: dadosGerais.pracaBairro,
 				pracaCidade: dadosGerais.pracaCidade,
 				pracaEstado: dadosGerais.pracaEstado,
-
+				
 				// Contato
-				nomeContato: dadosGerais.nomeContato || undefined,
-				telefone1: dadosGerais.telefone1 || undefined,
-				telefone2: dadosGerais.telefone2 || undefined,
-				fax: dadosGerais.fax || undefined,
-				site: dadosGerais.site || undefined,
-				emailComercial: dadosGerais.emailComercial || undefined,
-				emailFiscal: dadosGerais.emailFiscal || undefined,
-
-				// Vendedores
+				nomeContato: dadosGerais.nomeContato || "",
+				telefone1: dadosGerais.telefone1 || "",
+				telefone2: dadosGerais.telefone2 || "",
+				fax: dadosGerais.fax || "",
+				site: dadosGerais.site || "",
+				emailComercial: dadosGerais.emailComercial || "",
+				emailFiscal: dadosGerais.emailFiscal || "",
+				
+				// Dados Adicionais
 				vendedor1: {
 					codigo: dadosAdicionais.vendedor1.codigo || "",
-					quantidade: dadosAdicionais.vendedor1.quantidade ? Number(dadosAdicionais.vendedor1.quantidade) : 0
+					quantidade: Number(dadosAdicionais.vendedor1.quantidade) || 0
 				},
 				vendedor2: {
 					codigo: dadosAdicionais.vendedor2.codigo || "",
-					quantidade: dadosAdicionais.vendedor2.quantidade ? Number(dadosAdicionais.vendedor2.quantidade) : 0
+					quantidade: Number(dadosAdicionais.vendedor2.quantidade) || 0
 				},
 				vendedor3: {
 					codigo: dadosAdicionais.vendedor3.codigo || "",
-					quantidade: dadosAdicionais.vendedor3.quantidade ? Number(dadosAdicionais.vendedor3.quantidade) : 0
+					quantidade: Number(dadosAdicionais.vendedor3.quantidade) || 0
 				},
 				vendedor4: {
 					codigo: dadosAdicionais.vendedor4.codigo || "",
-					quantidade: dadosAdicionais.vendedor4.quantidade ? Number(dadosAdicionais.vendedor4.quantidade) : 0
+					quantidade: Number(dadosAdicionais.vendedor4.quantidade) || 0
 				},
 				vendedor5: {
 					codigo: dadosAdicionais.vendedor5.codigo || "",
-					quantidade: dadosAdicionais.vendedor5.quantidade ? Number(dadosAdicionais.vendedor5.quantidade) : 0
+					quantidade: Number(dadosAdicionais.vendedor5.quantidade) || 0
 				},
 				vendedor6: {
 					codigo: dadosAdicionais.vendedor6.codigo || "",
-					quantidade: dadosAdicionais.vendedor6.quantidade ? Number(dadosAdicionais.vendedor6.quantidade) : 0
+					quantidade: Number(dadosAdicionais.vendedor6.quantidade) || 0
 				},
-
-				// Configurações
 				isentoJPI: dadosAdicionais.isentoJPI || "0",
 				percentualAumentoTeorico: Number(dadosAdicionais.percentualAumentoTeorico) || 0,
 				percentualPerda: Number(dadosAdicionais.percentualPerda) || 0,
-
-				// Contatos adicionais
-				contatosAdicionais: dadosAdicionais.contatosAdicionais?.map(contato => ({
-					id: contato.id || "-1",
-					contato: contato.contato || "",
-					telefone: contato.telefone || "",
-					ramal: contato.ramal || "",
-					setor: contato.setor || "",
-					email: contato.email || ""
-				})) || [],
-
-				// Campos do sistema
-				observacoesGerais: dadosAdicionais.observacoesGerais || undefined,
-				organizacao_id: 1,
-				user_id: 1
+				contatosAdicionais: dadosAdicionais.contatosAdicionais || [],
+				observacoesGerais: dadosAdicionais.observacoesGerais || "",
+				user_id: 1, // Valor fixo para teste
+				organizacao_id: 1 // Valor fixo para teste
 			};
 
-			console.log("Dados preparados para envio:", JSON.stringify(dadosBase, null, 2));
+			console.log("Dados preparados para envio:", dadosBase);
 
 			if (clienteId) {
 				await editarClienteFn({
+					clienteId,
 					...dadosBase,
-					contato_id: Number(clienteId),
-					endereco_id: Number(clienteId),
-					endereco_praca_id: Number(clienteId),
 				});
+				toast.success("Cliente editado com sucesso!");
+				queryClient.invalidateQueries({ queryKey: ["listar-clientes"] });
+				navigate("/cadastros/clientes");
 			} else {
 				await criarClienteFn(dadosBase);
 			}
 		} catch (error) {
 			console.error("Erro ao salvar cliente:", error);
-			if (error.response?.data) {
-				console.error("Detalhes do erro:", error.response.data);
+			if (error instanceof AxiosError) {
+				console.error("Detalhes do erro:", error.response?.data);
+				toast.error(error.response?.data?.message || "Erro ao salvar cliente");
+			} else {
+				toast.error("Erro ao salvar cliente");
 			}
-			toast.error("Erro ao salvar cliente");
 		}
 	};
 

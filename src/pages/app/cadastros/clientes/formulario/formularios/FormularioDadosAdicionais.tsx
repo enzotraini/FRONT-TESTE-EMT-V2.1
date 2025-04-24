@@ -4,6 +4,7 @@ import {
 	FormDescription,
 	FormField,
 	FormItem,
+	FormLabel,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -33,38 +34,20 @@ const booleanSelectorLabelHash = {
 };
 
 const vendedorSchema = z.object({
-	codigo: z.string().optional(),
-	quantidade: z.coerce.number().optional(),
+	codigo: z.string().default(""),
+	quantidade: z.coerce.number().min(0).default(0),
 });
 
 export const dadosAdicionaisFormSchema = z.object({
-	vendedor1: z.object({
-		codigo: z.string().default(""),
-		quantidade: z.coerce.number().default(0)
-	}),
-	vendedor2: z.object({
-		codigo: z.string().default(""),
-		quantidade: z.coerce.number().default(0)
-	}),
-	vendedor3: z.object({
-		codigo: z.string().default(""),
-		quantidade: z.coerce.number().default(0)
-	}),
-	vendedor4: z.object({
-		codigo: z.string().default(""),
-		quantidade: z.coerce.number().default(0)
-	}),
-	vendedor5: z.object({
-		codigo: z.string().default(""),
-		quantidade: z.coerce.number().default(0)
-	}),
-	vendedor6: z.object({
-		codigo: z.string().default(""),
-		quantidade: z.coerce.number().default(0)
-	}),
+	vendedor1: vendedorSchema,
+	vendedor2: vendedorSchema,
+	vendedor3: vendedorSchema,
+	vendedor4: vendedorSchema,
+	vendedor5: vendedorSchema,
+	vendedor6: vendedorSchema,
 	isentoJPI: z.enum(booleanSelector).default("0"),
-	percentualAumentoTeorico: z.coerce.number().default(0),
-	percentualPerda: z.coerce.number().default(0),
+	percentualAumentoTeorico: z.coerce.number().min(0, "Percentual de aumento teórico deve ser maior ou igual a 0").default(0),
+	percentualPerda: z.coerce.number().min(0, "Percentual de perda deve ser maior ou igual a 0").default(0),
 	contatosAdicionais: z.array(z.object({
 		id: z.string().default("-1"),
 		contato: z.string().default(""),

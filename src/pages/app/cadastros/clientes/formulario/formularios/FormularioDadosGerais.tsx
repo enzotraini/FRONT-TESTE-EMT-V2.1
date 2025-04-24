@@ -42,10 +42,7 @@ const tiposConsumoLabelHash = {
 
 export const dadosGeraisFormSchema = z.object({
 	// Informações
-	codigo: z
-		.string()
-		.transform((_) => "")
-		.default(""),
+	codigo: z.string().default(""),
 	nome: z.string({ required_error: "Nome é obrigatório" }).nonempty({
 		message: "Nome é obrigatório.",
 	}),
@@ -80,7 +77,7 @@ export const dadosGeraisFormSchema = z.object({
 	rua: z.string({ required_error: "Rua é obrigatória." }).nonempty({
 		message: "Rua é obrigatória.",
 	}),
-	numero: z.string().default(""),
+	numero: z.coerce.number().default(0),
 	complemento: z.string().default(""),
 	bairro: z.string({ required_error: "Bairro é obrigatório." }).nonempty({
 		message: "Bairro é obrigatório.",
@@ -113,7 +110,7 @@ export const dadosGeraisFormSchema = z.object({
 	pracaRua: z.string({ required_error: "Rua é obrigatória." }).nonempty({
 		message: "Rua é obrigatória.",
 	}),
-	pracaNumero: z.string().default(""),
+	pracaNumero: z.coerce.number().default(0),
 	pracaComplemento: z.string().default(""),
 	pracaBairro: z.string({ required_error: "Bairro é obrigatório." }).nonempty({
 		message: "Bairro é obrigatório.",
