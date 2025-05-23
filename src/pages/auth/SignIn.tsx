@@ -121,6 +121,7 @@ export function SignIn() {
 		console.log("[SignIn] Cookies antes do login:", document.cookie);
 		
 		try {
+			
 			await authenticateFn(data);
 		} catch (error) {
 			console.error("[SignIn] Erro ao fazer login:", error);

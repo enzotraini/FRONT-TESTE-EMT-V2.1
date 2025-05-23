@@ -25,6 +25,7 @@ import {
 	type ColumnDef,
 } from "@tanstack/react-table";
 import { Loader } from "lucide-react";
+import React from "react";
 import {
 	type ReactNode,
 	type SetStateAction,
@@ -38,7 +39,7 @@ interface DataTableProps<TData, TValue> {
 	isLoading: boolean;
 	data: TData[];
 	renderContextMenuContent?: (row: Row<TData>) => ReactNode;
-	onChangeSelection: (selectedItems: string[]) => void;
+	onChangeSelection?: (selectedIds: string[]) => void;
 	meta: {
 		page: number;
 		perPage: number;
@@ -72,8 +73,10 @@ export function DataTable<TData, TValue>({
 	const selectedRows = table.getFilteredSelectedRowModel().rows;
 
 	useEffect(() => {
-		onChangeSelection(selectedRows.map((row) => row.getValue("id")));
-	}, [selectedRows, onChangeSelection]);
+		if (onChangeSelection) {
+			onChangeSelection(selectedRows.map((row) => row.getValue("id")));
+		}
+	}, [selectedRows, onChangeSelection]);	
 
 	function handlePageChange(page: number) {
 		setRowSelection({});
@@ -114,64 +117,45 @@ export function DataTable<TData, TValue>({
 								))}
 							</TableHeader>
 							<TableBody>
-								<TableRow>
-									<TableCell
-										colSpan={columns.length}
-										className="p-4 text-start"
-									>
-										{selectedRows.length} registros selecionados
-									</TableCell>
-								</TableRow>
-
-								{table.getRowModel().rows?.length ? (
-									table.getRowModel().rows.map((row) => (
-										<>
-											{renderContextMenuContent ? (
-												<ContextMenu key={row.id}>
-													<ContextMenuTrigger asChild>
-														<TableRow
-															key={row.id}
-															data-state={row.getIsSelected() && "selected"}
-														>
-															{row.getVisibleCells().map((cell) => (
-																<TableCell key={cell.id}>
-																	{flexRender(
-																		cell.column.columnDef.cell,
-																		cell.getContext(),
-																	)}
-																</TableCell>
-															))}
-														</TableRow>
-													</ContextMenuTrigger>
-													{renderContextMenuContent(row)}
-												</ContextMenu>
-											) : (
-												<TableRow
-													key={row.id}
-													data-state={row.getIsSelected() && "selected"}
-												>
-													{row.getVisibleCells().map((cell) => (
-														<TableCell key={cell.id}>
-															{flexRender(
-																cell.column.columnDef.cell,
-																cell.getContext(),
-															)}
-														</TableCell>
-													))}
-												</TableRow>
-											)}
-										</>
-									))
-								) : (
+								{onChangeSelection && selectedRows.length > 0 && (
 									<TableRow>
 										<TableCell
 											colSpan={columns.length}
-											className="h-24 text-center"
+											className="p-4 text-start"
 										>
-											Nenhum registro encontrado
+											{selectedRows.length} registros selecionados
 										</TableCell>
 									</TableRow>
 								)}
+							{table.getRowModel().rows?.length ? (
+								table.getRowModel().rows.map((row) => {
+									const tableRow = (
+									<TableRow data-state={row.getIsSelected() && "selected"}>
+										{row.getVisibleCells().map((cell) => (
+										<TableCell key={cell.id}>
+											{flexRender(cell.column.columnDef.cell, cell.getContext())}
+										</TableCell>
+										))}
+									</TableRow>
+									);
+
+									return renderContextMenuContent ? (
+									<ContextMenu key={row.id.toString()}>
+										<ContextMenuTrigger asChild>{tableRow}</ContextMenuTrigger>
+										{renderContextMenuContent(row)}
+									</ContextMenu>
+									) : (
+									<React.Fragment key={row.id.toString()}>{tableRow}</React.Fragment>
+									);
+								})
+								) : (
+								<TableRow>
+									<TableCell colSpan={columns.length} className="h-24 text-center">
+									Nenhum registro encontrado
+									</TableCell>
+								</TableRow>
+								)}
+
 							</TableBody>
 						</Table>
 					</div>

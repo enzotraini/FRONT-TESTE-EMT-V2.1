@@ -63,7 +63,7 @@ export interface EditarClienteParams {
 export async function editarCliente(params: EditarClienteParams) {
 	console.log("Iniciando requisição para editar cliente:", JSON.stringify(params, null, 2));
 	try {
-		const response = await api.put(`/clientes/${params.contato_id}`, params);
+		const response = await api.put(`/fornecedores/${params.contato_id}`, params);
 		console.log("Resposta do servidor:", {
 			status: response.status,
 			data: response.data,

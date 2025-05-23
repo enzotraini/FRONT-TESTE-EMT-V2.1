@@ -32,6 +32,7 @@ async function waitForCookies(maxAttempts = 30, interval = 200): Promise<boolean
 }
 
 export async function authenticate({ email, senha }: AuthenticateBody) {
+	
 	console.log("[authenticate] Iniciando requisição de autenticação");
 	console.log("[authenticate] URL:", api.defaults.baseURL);
 	console.log("[authenticate] Headers:", api.defaults.headers);
@@ -43,13 +44,13 @@ export async function authenticate({ email, senha }: AuthenticateBody) {
 		if (healthCheck.status !== 200) {
 			throw new Error("Backend não está disponível");
 		}
-		
+		debugger
 		const response = await api.post<AuthenticateResponse>("/auth", { 
 			email, 
 			senha 
 		});
 		
-		console.log("[authenticate] Resposta recebida:", {
+		console.log("[authenticate] Resposta recebida 11:", {
 			status: response.status,
 			statusText: response.statusText,
 			headers: response.headers,

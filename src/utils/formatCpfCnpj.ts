@@ -1,5 +1,5 @@
-export function formatCpfCnpj(value: string) {
-	const cleanedValue = value.replace(/\D/g, "");
+export function formatCpfCnpj(value: string | undefined | null) {
+	const cleanedValue = (value ?? "").replace(/\D/g, "");
 
 	if (cleanedValue.length <= 11) {
 		return formatCpf(cleanedValue);

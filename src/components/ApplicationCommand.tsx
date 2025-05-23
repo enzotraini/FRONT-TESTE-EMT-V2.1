@@ -47,6 +47,9 @@ export function ApplicationCommand() {
 					<CommandItem>
 						<Link to="/cadastros/clientes">Cadastro de clientes</Link>
 					</CommandItem>
+					<CommandItem>
+						<Link to="/cadastros/clientes">Cadastro de Fornecedores</Link>
+					</CommandItem>
 				</CommandGroup>
 				<CommandSeparator />
 				<CommandGroup heading="Configurações">

@@ -13,6 +13,9 @@ import { FormularioDeTransportadora } from "@/pages/cadastros/transportadoras/fo
 import { EntradaDeMercadoria } from "@/pages/cadastros/entrada-mercadoria/EntradaDeMercadoria";
 import { FormularioDeEntradaDeMercadoria } from "@/pages/cadastros/entrada-mercadoria/formulario/FormularioDeEntradaDeMercadoria";
 import { ConfiguracoesPage } from "@/pages/configuracoes";
+import { FormularioFornecedor } from "@/pages/cadastros/fornecedores/formularios/FormularioDeFornecedor";
+import { Fornecedores } from "@/pages/cadastros/fornecedores/fornecedor";
+//import { FormularioDadosGerais } from "@/pages/cadastros/fornecedores/formularios/FormularioDadosGerais";
 
 export const routes = createBrowserRouter([
 	{
@@ -83,6 +86,28 @@ export const routes = createBrowserRouter([
 							{
 								path: ":id",
 								element: <FormularioDeEntradaDeMercadoria />,
+							},
+						],
+					},
+					{
+						path: "fornecedores",
+						element: <Outlet />,
+						children: [
+							{
+								path: "",
+								element: <Fornecedores />,
+							},
+							{
+								path: "novo",
+								element: <FormularioFornecedor />,
+							},
+							{
+								path: ":id",
+								element: <FormularioFornecedor />,
+							},
+							{
+								path: "editar/:id",
+								element: <FormularioFornecedor />,
 							},
 						],
 					},
