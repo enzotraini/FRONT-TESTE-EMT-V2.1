@@ -44,7 +44,6 @@ export async function authenticate({ email, senha }: AuthenticateBody) {
 		if (healthCheck.status !== 200) {
 			throw new Error("Backend não está disponível");
 		}
-		debugger
 		const response = await api.post<AuthenticateResponse>("/auth", { 
 			email, 
 			senha 

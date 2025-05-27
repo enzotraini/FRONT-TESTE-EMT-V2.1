@@ -31,82 +31,6 @@ import { deletarFornecedor } from "@/api/fornecedor/deletar-fornecedor";
 import { watch } from "fs";
 import { Edit, Trash2 } from "lucide-react";
 
-// const columns: ColumnDef<FornecedorDaListagem>[] = [
-//   {
-//     id: "select",
-//     header: ({ table }) => (
-//       <Checkbox
-//         checked={
-//           table.getIsAllPageRowsSelected() ||
-//           (table.getIsSomePageRowsSelected() && "indeterminate")
-//         }
-//         onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-//         aria-label="Select all"
-//       />
-//     ),
-//     cell: ({ row }) => (
-//       <Checkbox
-//         checked={row.getIsSelected()}
-//         onCheckedChange={(value) => row.toggleSelected(!!value)}
-//         aria-label="Select row"
-//       />
-//     ),
-//     enableSorting: false,
-//     enableHiding: false,
-//     size: 20,
-//   },
-//   {
-//     accessorKey: "id",
-//     header: "Código",
-//     size: 60,
-//   },
-//   {
-//     accessorKey: "nome",
-//     header: "Nome",
-//     size: 300,
-//   },
-//   {
-//     accessorKey: "fantasia",
-//     header: "Fantasia",
-//     size: 200,
-//   },
-//   {
-//     accessorKey: "cgcfor",
-//     header: "CNPJ/CPF",
-//     size: 120,
-//   },
-//   {
-//     accessorKey: "contato",
-//     header: "Contato",
-//     size: 170,
-//   },
-//   {
-//     accessorKey: "telefone1",
-//     header: "Telefone 1",
-//     size: 150,
-//   },
-//   {
-//     accessorKey: "telefone2",
-//     header: "Telefone 2",
-//     size: 150,
-//   },
-//   {
-//     accessorKey: "fax",
-//     header: "Fax",
-//     size: 150,
-//   },
-//   {
-//     accessorKey: "dtcadastro",
-//     header: "Data de Cadastro",
-//     size: 140,
-//   },
-//   {
-//     accessorKey: "segmento",
-//     header: "Segmento",
-//     size: 160,
-//   },
-// ];
-
 
 const buscarFornecedoresFormSchema = z.object({
   search: z.string().optional(),
@@ -119,7 +43,6 @@ export function Fornecedores() {
   const navigate = useNavigate();
 
   function handleEditar(id: number) {
-    debugger
     navigate(`/cadastros/fornecedores/editar/${id}`);
   }  
 
@@ -252,15 +175,16 @@ export function Fornecedores() {
 
   const searchWatched = buscarFornecedoresForm.watch("search") ?? "";
 
-	useEffect(() => {
-		if (searchWatched.length >= 3 || searchWatched.length === 0) {
-		  setSearchParams((prev) => {
-			prev.set("page", "1");
-			prev.set("search", searchWatched);
-			return prev;
-		  });
-		}
-	  }, [searchWatched, setSearchParams]);
+useEffect(() => {
+	if (searchWatched.length >= 3 || searchWatched.length === 0) {
+		setSearchParams((prev) => {
+			const newParams = new URLSearchParams(prev);
+			newParams.set("search", searchWatched); // mantém a page atual!
+			return newParams;
+		});
+	}
+}, [searchWatched, setSearchParams]);
+
 	  
 
   return (

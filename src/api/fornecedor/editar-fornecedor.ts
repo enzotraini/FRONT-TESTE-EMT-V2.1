@@ -15,6 +15,7 @@ export interface EditarFornecedorParams {
 
   estadualrg: string;
   tipoie: string;
+  ctacontabi: string,	
 
   nomeFantasia?: string;
   observacao?: string;
@@ -32,6 +33,7 @@ export interface EditarFornecedorParams {
 
 export async function editarFornecedor(params: EditarFornecedorParams) {
   console.log("Iniciando requisição para editar fornecedor:", JSON.stringify(params, null, 2));
+  
   try {
     const response = await api.put(`/fornecedores/${params.codigo}`, params);
 

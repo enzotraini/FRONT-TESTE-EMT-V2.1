@@ -67,33 +67,22 @@ export function FormularioFornecedor() {
 			identificador: "",
 			cep: "",
 			rua: "",
-			//numero: null,
+			numero: 0,
 			complemento: "",
 			bairro: "",
 			cidade: "",
 			estado: "",
 			estadualrg: "",
-			tipoie: "",
-			//contribuinteICMS: "1",
-			//isuframa: "",
+			tipoie: 0,
+			ctacontabi: "",
 			nomeFantasia: "",
 			observacao: "",
-			//tipoConsumo: "1",
-			// pracaCep: "",
-			// pracaRua: "",
-			//pracaNumero: "",
-			// pracaComplemento: "",
-			// pracaBairro: "",
-			// pracaCidade: "",
-			// pracaEstado: "",
 			nomeContato: "",
 			telefone1: "",
 			telefone2: "",
-			//fax: "",
 			site: "",
 			emailComercial: "",
 			emailFiscal: "",
-			//contatosAdicionais: [],
 			codigo: ""
 		  }
 	});
@@ -173,24 +162,42 @@ export function FormularioFornecedor() {
 		mutationFn: editarFornecedor,
 	});
 
+	// Preenche o formulário com todos os dados exceto contaContabil
 	useEffect(() => {
+		if (!dadosDoFornecedor || !dadosDoFornecedor.dadosGerais) return;
 
-	if (!dadosDoFornecedor || !dadosDoFornecedor.dadosGerais) {
-		console.log("dadosDoFornecedor ainda não carregado");
-		return;
-	}
+		console.log("Populando campos do formulário exceto contaContabil");
 
-	console.log("Populando formulário com dadosDoFornecedor:", dadosDoFornecedor);
+		const dados = dadosDoFornecedor.dadosGerais;
 
-	const dados =  dadosDoFornecedor.dadosGerais;//trimAllStrings(dadosDoFornecedor.dadosGerais);
+		for (const key of Object.keys(dados) as Array<keyof DadosGerais>) {
+			if (key === "contaContabil") continue; // pula contaContabil aqui
 
-	for (const key of Object.keys(dados) as Array<keyof DadosGerais>) {
-		const valor = transformValue(key, dados[key], transformationsDadosGerais);
-		setValueDadosGerais(key, valor);
-	}
-}, [dadosDoFornecedor, falhaAoBuscardadosDoFornecedor, setValueDadosGerais]);
+			const valor = transformValue(key, dados[key], transformationsDadosGerais);
+			setValueDadosGerais(key, valor);
+		}
+	}, [dadosDoFornecedor, setValueDadosGerais]);
 
+	// Preenche o campo contaContabil quando combo estiver carregado
+	useEffect(() => {
+		
+		if (
+			!dadosDoFornecedor?.dadosGerais?.ctacontabi ||
+			!dadosDaContaContabil ||
+			!Array.isArray(dadosDaContaContabil)
+		) {
+			return;
+		}
 
+		const existe = dadosDaContaContabil.some(
+			(c) => c.value === dadosDoFornecedor.dadosGerais.ctacontabi,
+		);
+
+		if (existe) {
+			console.log("Setando contaContabil:", dadosDoFornecedor.dadosGerais.ctacontabi);
+			setValueDadosGerais("contaContabil", dadosDoFornecedor.dadosGerais.ctacontabi);
+		}
+	}, [dadosDoFornecedor?.dadosGerais?.ctacontabi, dadosDaContaContabil, setValueDadosGerais]);
 
 	const handleSave = async () => {
 		console.log("Iniciando processo de salvar...");
@@ -213,7 +220,6 @@ export function FormularioFornecedor() {
 		const dadosGerais = dadosGeraisForm.getValues();
 		//const dadosAdicionais = dadosAdicionaisForm.getValues();		
 
-		debugger
 		console.log("Dados coletados dos formulários:", {
 			dadosGerais,
 		});
@@ -237,13 +243,13 @@ export function FormularioFornecedor() {
 				fantasia: dadosGerais?.nomeFantasia,
 				// Dados fiscais
 				estadualrg: dadosGerais.estadualrg?.replace(/\D/g, ""),
-				tipoie: dadosGerais?.tipoie,				
+				tipoie: dadosGerais?.tipoie,		
+				ctacontabi: dadosGerais?.contaContabil,		
 				// Contato
 				contato: dadosGerais?.nomeContato || "",
 				telefone1: dadosGerais?.telefone1 || "",
 				telefone2: dadosGerais?.telefone2 || "",
 				segmento: dadosGerais?.segmento,
-				//fax: dadosGerais?.fax || "",
 				site: dadosGerais?.site || "",
 				email: dadosGerais?.emailComercial || "",
 				emailfis: dadosGerais?.emailFiscal || "",
@@ -276,7 +282,6 @@ export function FormularioFornecedor() {
 	};
 
 	function handleReset() {
-		debugger
 		if (!dadosGeraisForm) return;
 
 		// Resetar dados gerais
@@ -293,6 +298,7 @@ export function FormularioFornecedor() {
 					{fornecedorId ? "Editar Fornecedor" : "Novo Fornecedor"}
 				</h1>
 				<div className="flex gap-2">
+					{fornecedorId ? "":
 					<Button
 						variant="outline"
 						onClick={handleReset}
@@ -300,7 +306,7 @@ export function FormularioFornecedor() {
 					>
 						<RotateCw className="h-4 w-4 mr-2" />
 						Resetar
-					</Button>
+					</Button>}
 					<Button onClick={handleSave} disabled={carregandoDadosDoFornecedor}>
 						{carregandoDadosDoFornecedor ? (
 							<Loader className="h-4 w-4 mr-2 animate-spin" />

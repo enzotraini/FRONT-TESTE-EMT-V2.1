@@ -16,24 +16,6 @@ export function Botoes({ fornecedoresSelecionados }: BotoesProps) {
 		navigate("/cadastros/fornecedores/novo");
 	}
 
-	function handleAlterar() {
-		navigate(`editar/${fornecedoresSelecionados[0]}`);
-	}
-
-	const { mutateAsync: deletarFornecedorFn } = useMutation({
-		mutationFn: deletarFornecedor,
-	});
-
-	function handleExcluir() {
-		Promise.all(
-			fornecedoresSelecionados.map((fornecedorId) =>
-				deletarFornecedorFn({ fornecedorId }),
-			),
-		).then(() => {
-			window.location.reload();
-		});
-	}
-
 	return (
 		<header className="flex gap-4 flex-wrap items-center justify-start p-4 bg-gray-50 border-b border-b-gray-200 dark:bg-gray-950 border-b dark:border-b-gray-800">
 			<Button
@@ -43,22 +25,6 @@ export function Botoes({ fornecedoresSelecionados }: BotoesProps) {
 			>
 				<Plus /> Incluir
 			</Button>
-			{/* <Button
-				variant="green"
-				onClick={handleAlterar}
-				disabled={fornecedoresSelecionados.length !== 1}
-			>
-				<Edit /> Alterar
-			</Button> */}
-			{/* <Button variant="ghost">
-				<Search /> Consultar
-			</Button> */}
-			{/* <Button variant="ghost">
-				<Printer /> Imprimir Ficha
-			</Button> */}
-			{/* <Button variant="destructive" onClick={handleExcluir}>
-				<Trash /> Excluir seleção
-			</Button> */}
 		</header>
 	);
 }

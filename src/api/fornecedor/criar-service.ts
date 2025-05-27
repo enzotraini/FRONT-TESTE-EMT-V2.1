@@ -55,23 +55,6 @@ export interface CriarService {
 	site?: string;
 	emailComercial?: string;
 	emailFiscal?: string;
-	// vendedor1: { codigo: string; quantidade?: number };
-	// vendedor2: { codigo: string; quantidade?: number };
-	// vendedor3: { codigo: string; quantidade?: number };
-	// vendedor4: { codigo: string; quantidade?: number };
-	// vendedor5: { codigo: string; quantidade?: number };
-	// vendedor6: { codigo: string; quantidade?: number };
-	// isentoJPI: "0" | "1";
-	// percentualAumentoTeorico: number;
-	// percentualPerda: number;
-	// contatosAdicionais: Array<{
-	// 	id: string;
-	// 	contato: string;
-	// 	telefone: string;
-	// 	ramal: string;
-	// 	setor: string;
-	// 	email: string;
-	// }>;
 	observacao?: string;
 	user_id: number;
 	organizacao_id: number;

@@ -45,6 +45,7 @@ export async function buscarFornecedores({
 	perPage,
 	search,
 }: BuscarFornecedoresParams) {
+	
 	const response = await api.get<BuscarFornecedoresResponse>("/fornecedores", {
 		params: {
 			page,

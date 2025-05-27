@@ -25,6 +25,7 @@ export interface BuscarDadosCompletosDoFornecedorResponse {
     site?: string;
     emailComercial?: string;
     emailFiscal?: string;
+    ctacontabi?: string;
   };
 }
 

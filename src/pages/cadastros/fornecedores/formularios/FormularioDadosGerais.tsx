@@ -35,9 +35,6 @@ export const dadosGeraisContribuintesValidos = ["1"] as const;
 
 export const dadosGeraisTiposConsumoValidos = ["1"] as const;
 
-// const [searchConta, setSearchConta] = useState("");
-// const { data: contaData } = useContasContabeis(searchConta);
-
 interface FormularioDadosGeraisProps {
   dadosGeraisForm: UseFormReturn<DadosGeraisForm>;
   contaData?: ListarContaContabilResponse;
@@ -45,7 +42,6 @@ interface FormularioDadosGeraisProps {
   searchConta: string;
   setSearchConta: React.Dispatch<React.SetStateAction<string>>;
 }
-
 
 export const dadosGeraisFormSchema = z.object({
 	codigo: z.string().default(""),
@@ -304,11 +300,24 @@ export function FormularioDadosGerais({
 									/>
 								</div>
 
-								{contaData?.map((conta) => (
-									<SelectItem key={conta.value} value={conta.value}>
+								{/* {contaData?.map((conta, index) => (
+									<SelectItem
+										key={`${conta.value}-${index}`} // Garante chave única
+										value={conta.value}
+									>
 										{conta.label}
 									</SelectItem>
-									))}
+									))} */}
+
+								{[...new Map(contaData?.map(item => [item.value, item])).values()].map(conta => (
+								<SelectItem key={conta.value} value={conta.value}>
+									{conta.label}
+								</SelectItem>
+								))}
+
+
+
+
 								</SelectContent>
 							</Select>
 							{errors.contaContabil && (
