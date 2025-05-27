@@ -1,23 +1,18 @@
 import { createBrowserRouter, Navigate, useNavigate, useLocation, Outlet } from "react-router-dom";
 import App from "../App";
-import { Dashboard } from "../pages/Dashboard";
 import { AuthLayout } from "../pages/_layouts/AuthLayout";
 import { AppLayout } from "../pages/_layouts/AppLayout";
 import { SignIn } from "../pages/auth/SignIn";
 import { SignUp } from "../pages/auth/SignUp";
 import { ForgotPassword } from "../pages/auth/ForgotPassword";
-import { ResetPassword } from "../pages/auth/ResetPassword";
 import { NotFound } from "../pages/NotFound";
-import { ErrorPage } from "../pages/ErrorPage";
 import { Transportadoras } from "../pages/cadastros/transportadoras/Transportadoras";
 import { FormularioDeTransportadora } from "../pages/cadastros/transportadoras/formulario/FormularioDeTransportadora";
 import { Clientes } from "../pages/app/cadastros/clientes/Clientes";
-import { FormularioDeCliente } from "../pages/app/cadastros/clientes/formulario/FormularioDeCliente";
-import { TabsList, TabsTrigger } from "../components/ui/tabs";
-import { cn } from "../lib/utils";
-import { RegistrarEntradaPage } from "../pages/entrada-mercadoria/registrar";
-import { ComprasPage } from "../pages/pedidos/compras/ComprasPage";
-import ConfiguracoesPage from "../pages/configuracoes";
+import { FormularioDeClientes } from "../pages/app/cadastros/clientes/formulario/FormularioDeCliente";
+import { RegistrarEntradaPage } from "../pages/app/entrada-mercadoria/RegistrarEntradaPage";
+import ComprasPage from "../pages/pedidos/compras/ComprasPage";
+import { ConfiguracoesPage } from "../pages/configuracoes";
 
 console.log("[ROUTER] Iniciando configuração de rotas...");
 
@@ -101,7 +96,7 @@ const router = createBrowserRouter([
 	{
 		path: "/",
 		element: <App />,
-		errorElement: <ErrorPage />,
+		errorElement: <div>Erro</div>,
 		children: [
 			{
 				path: "",
