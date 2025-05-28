@@ -74,7 +74,8 @@ export async function authenticate({ email, senha }: AuthenticateBody) {
 		
 		console.log("[authenticate] Cookies após aguardar:", document.cookie);
 		
-		return {};
+		window.location.href = "/";
+		
 	} catch (error) {
 		console.error("[authenticate] Erro na requisição:", error);
 		console.error("[authenticate] Stack trace:", (error as Error).stack);
