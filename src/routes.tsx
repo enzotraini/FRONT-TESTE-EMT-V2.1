@@ -15,6 +15,7 @@ import { FormularioDeEntradaDeMercadoria } from "@/pages/cadastros/entrada-merca
 import { ConfiguracoesPage } from "@/pages/configuracoes";
 import { FormularioFornecedor } from "@/pages/cadastros/fornecedores/formularios/FormularioDeFornecedor";
 import { Fornecedores } from "@/pages/cadastros/fornecedores/fornecedor";
+import { Produtos } from "@/pages/cadastros/produtos/produto";
 //import { FormularioDadosGerais } from "@/pages/cadastros/fornecedores/formularios/FormularioDadosGerais";
 
 export const routes = createBrowserRouter([
@@ -96,6 +97,28 @@ export const routes = createBrowserRouter([
 							{
 								path: "",
 								element: <Fornecedores />,
+							},
+							{
+								path: "novo",
+								element: <FormularioFornecedor />,
+							},
+							{
+								path: ":id",
+								element: <FormularioFornecedor />,
+							},
+							{
+								path: "editar/:id",
+								element: <FormularioFornecedor />,
+							},
+						],
+					},
+					{
+						path: "produtos",
+						element: <Outlet />,
+						children: [
+							{
+								path: "",
+								element: <Produtos />,
 							},
 							{
 								path: "novo",
