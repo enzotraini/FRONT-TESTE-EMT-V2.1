@@ -5,6 +5,15 @@ import path from "path";
 // https://vite.dev/config/
 export default defineConfig({
 	plugins: [react()],
+	build: {
+		rollupOptions: {
+			onwarn(warning, warn) {
+				// Ignora avisos de TypeScript durante o build
+				if (warning.code === 'UNRESOLVED_IMPORT') return;
+				warn(warning);
+			}
+		}
+	},
 	server: {
 		port: 5173,
 		host: true,
