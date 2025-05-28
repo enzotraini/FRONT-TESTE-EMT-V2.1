@@ -19,7 +19,7 @@ async function checkBackendAvailability() {
 	try {
 		const response = await axios.get(`${env.VITE_API_URL}/health`, {
 			timeout: 5000,
-			withCredentials: false,
+			withCredentials: true,
 		});
 		return response.status === 200;
 	} catch (error) {
