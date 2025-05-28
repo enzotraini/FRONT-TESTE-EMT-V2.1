@@ -65,12 +65,12 @@ export async function authenticate({ email, senha }: AuthenticateBody) {
 		console.log("[authenticate] Cookies antes de aguardar:", document.cookie);
 		
 		// Aguarda os cookies serem definidos
-		const cookiesSet = await waitForCookies(20, 200); // Aumentado para 20 tentativas e 200ms de intervalo
-		if (!cookiesSet) {
-			console.error("[authenticate] Cookies não foram definidos após a resposta");
-			console.log("[authenticate] Headers da resposta:", response.headers);
-			throw new Error("Timeout aguardando cookies de autenticação");
-		}
+		// const cookiesSet = await waitForCookies(20, 200); // Aumentado para 20 tentativas e 200ms de intervalo
+		// if (!cookiesSet) {
+		// 	console.error("[authenticate] Cookies não foram definidos após a resposta");
+		// 	console.log("[authenticate] Headers da resposta:", response.headers);
+		// 	throw new Error("Timeout aguardando cookies de autenticação");
+		// }
 		
 		console.log("[authenticate] Cookies após aguardar:", document.cookie);
 		
