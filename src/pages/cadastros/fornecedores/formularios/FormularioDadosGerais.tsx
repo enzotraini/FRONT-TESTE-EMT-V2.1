@@ -52,7 +52,7 @@ export const dadosGeraisFormSchema = z.object({
 	identificador: z
 		.string({ required_error: "CPF/CNPJ é obrigatório." })
 		.min(11, "CPF/CNPJ deve ter no mínimo 11 caracteres.")
-		.max(14, "CPF/CNPJ deve ter no máximo 14 caracteres."),
+		.max(18, "CPF/CNPJ deve ter no máximo 18 caracteres."),
 	cep: z
 		.string({ required_error: "CEP é obrigatório." })
 		.refine((cep) => cep.replace(/\D/g, "").length === 8, {
