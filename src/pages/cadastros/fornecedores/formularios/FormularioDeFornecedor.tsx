@@ -22,7 +22,7 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
-import { ListarContaContabilResponse, listarDaContaContabil } from "@/api/fiscal/get-conta-contabil";
+import { ListarResponse, listarDaContaContabil } from "@/api/fiscal/listas-produto";
 
 const tabTrigger =
 	"data-[state=active]:text-blue-500 data-[state=active]:border-b-2 data-[state=active]:border-blue-500 rounded-none hover:text-accent-foreground gap-2";
@@ -39,12 +39,10 @@ const transformationsDadosGerais: Transformations<DadosGerais> = {
 	cep: (value) => formatCep(value)
 };
 
-//const transformationsDadosAdicionais: Transformations<DadosAdicionais> = {};
-
 function transformValue<T, K extends keyof T>(
 	key: K,
 	value: T[K],
-	transformations: Transformations<T>,	
+	transformations: Transformations<T>,
 ): T[K] | undefined {
 	const transformFn = transformations[key];
 	if (transformFn) {
@@ -84,7 +82,7 @@ export function FormularioFornecedor() {
 			emailComercial: "",
 			emailFiscal: "",
 			codigo: ""
-		  }
+		}
 	});
 
 	const {
@@ -123,14 +121,14 @@ export function FormularioFornecedor() {
 		failureReason: falhaAoBuscarContasContabeis,
 		data: dadosDaContaContabil,
 		isFetching: carregandoContaContabil,
-	} = useQuery<ListarContaContabilResponse>({
-		queryKey: ["listar-conta-contabil", search ],
-		queryFn: () => listarDaContaContabil({ contaContabil: search ?? ""  }),
+	} = useQuery<ListarResponse>({
+		queryKey: ["listar-conta-contabil", search],
+		queryFn: () => listarDaContaContabil({ contaContabil: search ?? "" }),
 		enabled: search === "" || search.length > 3,
 		retry: (retries, error) => {
-		if (!(error instanceof AxiosError)) return false;
-		if (error.status && error.status >= 400 && error.status <= 499) return false;
-		return retries <= 2;
+			if (!(error instanceof AxiosError)) return false;
+			if (error.status && error.status >= 400 && error.status <= 499) return false;
+			return retries <= 2;
 		},
 		staleTime: 1000 * 60 * 5,
 	});
@@ -157,12 +155,11 @@ export function FormularioFornecedor() {
 			toast.error("Erro ao criar cliente");
 		}
 	});
-	
+
 	const { mutateAsync: editarFornecedorFn } = useMutation({
 		mutationFn: editarFornecedor,
 	});
 
-	// Preenche o formulário com todos os dados exceto contaContabil
 	useEffect(() => {
 		if (!dadosDoFornecedor || !dadosDoFornecedor.dadosGerais) return;
 
@@ -180,7 +177,7 @@ export function FormularioFornecedor() {
 
 	// Preenche o campo contaContabil quando combo estiver carregado
 	useEffect(() => {
-		
+
 		if (
 			!dadosDoFornecedor?.dadosGerais?.ctacontabi ||
 			!dadosDaContaContabil ||
@@ -201,10 +198,10 @@ export function FormularioFornecedor() {
 
 	const handleSave = async () => {
 		console.log("Iniciando processo de salvar...");
-		
+
 		// Validar formulários
 		const dadosGeraisValidos = await dadosGeraisForm.trigger();
-		
+
 		console.log("Validação dos formulários:", {
 			dadosGeraisValidos,
 		});
@@ -230,7 +227,7 @@ export function FormularioFornecedor() {
 				// Dados Gerais
 				empresa: "001",
 				cgcfor: dadosGerais?.identificador.replace(/\D/g, ""),
-				nome: dadosGerais?.nome,	
+				nome: dadosGerais?.nome,
 				// Endereço
 				endereco: dadosGerais?.rua,
 				nro: Number(dadosGerais?.numero) || 0,
@@ -243,8 +240,8 @@ export function FormularioFornecedor() {
 				fantasia: dadosGerais?.nomeFantasia,
 				// Dados fiscais
 				estadualrg: dadosGerais.estadualrg?.replace(/\D/g, ""),
-				tipoie: dadosGerais?.tipoie,		
-				ctacontabi: dadosGerais?.contaContabil,		
+				tipoie: dadosGerais?.tipoie,
+				ctacontabi: dadosGerais?.contaContabil,
 				// Contato
 				contato: dadosGerais?.nomeContato || "",
 				telefone1: dadosGerais?.telefone1 || "",
@@ -289,7 +286,7 @@ export function FormularioFornecedor() {
 		for (const key of Object.keys(touchedFieldsDadosGerais) as Array<keyof typeof dadosGeraisOriginais>) {
 			const valor = transformValue(key, dadosGeraisOriginais[key], transformationsDadosGerais);
 			setValueDadosGerais(key, valor ?? "");
-		}	
+		}
 	}
 	return (
 		<div className="flex flex-col gap-4">
@@ -298,15 +295,15 @@ export function FormularioFornecedor() {
 					{fornecedorId ? "Editar Fornecedor" : "Novo Fornecedor"}
 				</h1>
 				<div className="flex gap-2">
-					{fornecedorId ? "":
-					<Button
-						variant="outline"
-						onClick={handleReset}
-						disabled={carregandoDadosDoFornecedor}
-					>
-						<RotateCw className="h-4 w-4 mr-2" />
-						Resetar
-					</Button>}
+					{fornecedorId ? "" :
+						<Button
+							variant="outline"
+							onClick={handleReset}
+							disabled={carregandoDadosDoFornecedor}
+						>
+							<RotateCw className="h-4 w-4 mr-2" />
+							Resetar
+						</Button>}
 					<Button onClick={handleSave} disabled={carregandoDadosDoFornecedor}>
 						{carregandoDadosDoFornecedor ? (
 							<Loader className="h-4 w-4 mr-2 animate-spin" />
@@ -319,11 +316,11 @@ export function FormularioFornecedor() {
 			{/* <FormularioDadosGerais dadosGeraisForm={dadosGeraisForm} /> */}
 
 			<FormularioDadosGerais
-			dadosGeraisForm={dadosGeraisForm}
-			contaData={dadosDaContaContabil}
-			carregandoContaContabil={carregandoContaContabil}
-			setSearchConta={setSearch} // função que altera o search
-			searchConta={search}
+				dadosGeraisForm={dadosGeraisForm}
+				contaData={dadosDaContaContabil}
+				carregandoContaContabil={carregandoContaContabil}
+				setSearchConta={setSearch} // função que altera o search
+				searchConta={search}
 			/>
 		</div>
 	);

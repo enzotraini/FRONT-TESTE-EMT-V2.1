@@ -5,11 +5,7 @@ import { useMutation } from "@tanstack/react-query";
 import { Edit, Plus, Printer, Search, Trash } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-interface BotoesProps {
-	produtosSelecionados: string[];
-}
-
-export function Botoes({ produtosSelecionados }: BotoesProps) {
+export function Botoes() {
 	const navigate = useNavigate();
 
 	function handleIncluir() {
@@ -21,7 +17,6 @@ export function Botoes({ produtosSelecionados }: BotoesProps) {
 			<Button
 				onClick={handleIncluir}
 				variant="default"
-				disabled={produtosSelecionados.length !== 0}
 			>
 				<Plus /> Incluir
 			</Button>

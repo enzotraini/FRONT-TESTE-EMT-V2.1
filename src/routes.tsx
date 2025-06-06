@@ -16,6 +16,7 @@ import { ConfiguracoesPage } from "@/pages/configuracoes";
 import { FormularioFornecedor } from "@/pages/cadastros/fornecedores/formularios/FormularioDeFornecedor";
 import { Fornecedores } from "@/pages/cadastros/fornecedores/fornecedor";
 import { Produtos } from "@/pages/cadastros/produtos/produto";
+import { FormularioProduto } from "@/pages/cadastros/produtos/formularios/FormularioDeProduto";
 //import { FormularioDadosGerais } from "@/pages/cadastros/fornecedores/formularios/FormularioDadosGerais";
 
 export const routes = createBrowserRouter([
@@ -122,15 +123,15 @@ export const routes = createBrowserRouter([
 							},
 							{
 								path: "novo",
-								element: <FormularioFornecedor />,
+								element: <FormularioProduto />,
 							},
 							{
 								path: ":id",
-								element: <FormularioFornecedor />,
+								element: <FormularioProduto />,
 							},
 							{
 								path: "editar/:id",
-								element: <FormularioFornecedor />,
+								element: <FormularioProduto />,
 							},
 						],
 					},

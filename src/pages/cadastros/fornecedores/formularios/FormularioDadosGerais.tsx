@@ -1,4 +1,4 @@
-import { ListarContaContabilResponse } from "@/api/fiscal/get-conta-contabil";
+import { ListarResponse } from "@/api/fiscal/listas-produto";
 import { TitleSeparator } from "@/components/TitleSeparator";
 import {
 	Form,
@@ -24,9 +24,9 @@ import type { UseFormReturn } from "react-hook-form";
 import { z } from "zod";
 
 const tiposIELabelHash: Record<string, string> = {
-  "1": "1 - Contribuinte ICMS (informar a IE do destinatário)",
-  "2": "2 - Contribuinte isento de Inscrição no cadastro de Contribuintes do ICMS",
-  "9": "9 - Não Contribuinte, que pode ou não possuir Inscrição Estadual no Cadastro",
+	"1": "1 - Contribuinte ICMS (informar a IE do destinatário)",
+	"2": "2 - Contribuinte isento de Inscrição no cadastro de Contribuintes do ICMS",
+	"9": "9 - Não Contribuinte, que pode ou não possuir Inscrição Estadual no Cadastro",
 };
 
 export const tiposIEValidos = ["1", "2", "9"] as const;
@@ -36,11 +36,11 @@ export const dadosGeraisContribuintesValidos = ["1"] as const;
 export const dadosGeraisTiposConsumoValidos = ["1"] as const;
 
 interface FormularioDadosGeraisProps {
-  dadosGeraisForm: UseFormReturn<DadosGeraisForm>;
-  contaData?: ListarContaContabilResponse;
-  carregandoContaContabil: boolean;
-  searchConta: string;
-  setSearchConta: React.Dispatch<React.SetStateAction<string>>;
+	dadosGeraisForm: UseFormReturn<DadosGeraisForm>;
+	contaData?: ListarResponse;
+	carregandoContaContabil: boolean;
+	searchConta: string;
+	setSearchConta: React.Dispatch<React.SetStateAction<string>>;
 }
 
 export const dadosGeraisFormSchema = z.object({
@@ -58,7 +58,7 @@ export const dadosGeraisFormSchema = z.object({
 		.refine((cep) => cep.replace(/\D/g, "").length === 8, {
 			message: "CEP inválido.",
 		}),
-		//.max(9, "CEP deve ter no máximo 9 caracteres."),
+	//.max(9, "CEP deve ter no máximo 9 caracteres."),
 	rua: z
 		.string({ required_error: "Rua é obrigatória." })
 		.min(1, "Rua é obrigatória.")
@@ -89,7 +89,7 @@ export const dadosGeraisFormSchema = z.object({
 	site: z.string().max(100, "Site deve ter no máximo 100 caracteres.").default(""),
 	estadualrg: z.string().max(15, "IE deve ter no máximo 15 caracteres.").default(""),
 	tipoie: z.preprocess(
-	(val) => String(val),
+		(val) => String(val),
 		z.enum(tiposIEValidos, {
 			required_error: "Tipo de IE é obrigatório",
 			invalid_type_error: "Tipo de IE inválido"
@@ -97,21 +97,21 @@ export const dadosGeraisFormSchema = z.object({
 	),
 	contaContabil: z.string().max(8, "Conta contábil inválida").optional(),
 	emailComercial: z
-	.string()
-	.max(50, "Email comercial deve ter no máximo 50 caracteres.")
-	.refine(
-		(val) => val === "" || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val),
-		{ message: "Email comercial inválido." }
-	)
-	.default(""),
+		.string()
+		.max(50, "Email comercial deve ter no máximo 50 caracteres.")
+		.refine(
+			(val) => val === "" || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val),
+			{ message: "Email comercial inválido." }
+		)
+		.default(""),
 	emailFiscal: z
-	.string()
-	.max(100, "Email fiscal deve ter no máximo 100 caracteres.")
-	.refine(
-		(val) => val === "" || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val),
-		{ message: "Email fiscal inválido." }
-	)
-	.default(""),
+		.string()
+		.max(100, "Email fiscal deve ter no máximo 100 caracteres.")
+		.refine(
+			(val) => val === "" || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val),
+			{ message: "Email fiscal inválido." }
+		)
+		.default(""),
 });
 
 export type DadosGeraisForm = z.infer<typeof dadosGeraisFormSchema>;
@@ -121,11 +121,11 @@ interface FormularioDadosGeraisProps {
 }
 
 export function FormularioDadosGerais({
-  dadosGeraisForm,
-  contaData,
-  carregandoContaContabil,
-  searchConta,
-  setSearchConta,
+	dadosGeraisForm,
+	contaData,
+	carregandoContaContabil,
+	searchConta,
+	setSearchConta,
 }: FormularioDadosGeraisProps) {
 
 	const {
@@ -194,7 +194,7 @@ export function FormularioDadosGerais({
 								)}
 							</FormItem>
 						)}
-					/>					
+					/>
 					<FormField
 						control={dadosGeraisForm.control}
 						name="identificador"
@@ -247,87 +247,75 @@ export function FormularioDadosGerais({
 						name="tipoie"
 						render={({ field: { onChange, ...props } }) => (
 							<FormItem className="col-span-2">
-							<Select
-								onValueChange={(e) => {
-								clearErrors("tipoie");
-								onChange(e);
-								}}
-								value={props.value}
-							>
-								<SelectTrigger>
-								<SelectValue placeholder="Tipo de IE" />
-								</SelectTrigger>
-								<SelectContent>
-								{Object.entries(tiposIELabelHash).map(([key, label]) => (
-									<SelectItem key={key} value={key}>
-									{label}
-									</SelectItem>
-								))}
-								</SelectContent>
-							</Select>
-							{errors.tipoie && (
-								<FormDescription className="text-destructive">
-								{errors.tipoie.message}
-								</FormDescription>
-							)}
+								<Select
+									onValueChange={(e) => {
+										clearErrors("tipoie");
+										onChange(e);
+									}}
+									value={props.value}
+								>
+									<SelectTrigger>
+										<SelectValue placeholder="Tipo de IE" />
+									</SelectTrigger>
+									<SelectContent>
+										{Object.entries(tiposIELabelHash).map(([key, label]) => (
+											<SelectItem key={key} value={key}>
+												{label}
+											</SelectItem>
+										))}
+									</SelectContent>
+								</Select>
+								{errors.tipoie && (
+									<FormDescription className="text-destructive">
+										{errors.tipoie.message}
+									</FormDescription>
+								)}
 							</FormItem>
 						)}
-						/>
+					/>
 				</div>
 				<div className="grid grid-cols-4 gap-4">
-				<FormField
+					<FormField
 						control={dadosGeraisForm.control}
 						name="contaContabil"
 						render={({ field: { onChange, value } }) => (
 							<FormItem className="col-span-2">
-							<Select
-								onValueChange={(val) => {
-								clearErrors("contaContabil");
-								onChange(val);
-								}}
-								value={value}
-							>
-								<SelectTrigger>
-								<SelectValue placeholder="Conta Contábil" />
-								</SelectTrigger>
-								<SelectContent>
-								<div className="p-2">
-									<input
-									className="w-full border p-2 text-sm"
-									placeholder="Buscar conta..."
-									value={searchConta}
-									onChange={(e) => setSearchConta(e.target.value)}
-									/>
-								</div>
+								<Select
+									onValueChange={(val) => {
+										clearErrors("contaContabil");
+										onChange(val);
+									}}
+									value={value}
+								>
+									<SelectTrigger>
+										<SelectValue placeholder="Conta Contábil" />
+									</SelectTrigger>
+									<SelectContent>
+										<div className="p-2">
+											<input
+												className="w-full border p-2 text-sm"
+												placeholder="Buscar conta..."
+												value={searchConta}
+												onChange={(e) => setSearchConta(e.target.value)}
+											/>
+										</div>
 
-								{/* {contaData?.map((conta, index) => (
-									<SelectItem
-										key={`${conta.value}-${index}`} // Garante chave única
-										value={conta.value}
-									>
-										{conta.label}
-									</SelectItem>
-									))} */}
+										{[...new Map(contaData?.map(item => [item.value, item])).values()].map(conta => (
+											<SelectItem key={conta.value} value={conta.value}>
+												{conta.label}
+											</SelectItem>
+										))}
 
-								{[...new Map(contaData?.map(item => [item.value, item])).values()].map(conta => (
-								<SelectItem key={conta.value} value={conta.value}>
-									{conta.label}
-								</SelectItem>
-								))}
-
-
-
-
-								</SelectContent>
-							</Select>
-							{errors.contaContabil && (
-								<FormDescription className="text-destructive">
-								{errors.contaContabil.message}
-								</FormDescription>
-							)}
+									</SelectContent>
+								</Select>
+								{errors.contaContabil && (
+									<FormDescription className="text-destructive">
+										{errors.contaContabil.message}
+									</FormDescription>
+								)}
 							</FormItem>
 						)}
-						/>
+					/>
 				</div>
 				<TitleSeparator title="Endereço" />
 				<div className="grid grid-cols-4 gap-4">
@@ -549,163 +537,6 @@ export function FormularioDadosGerais({
 						)}
 					/>
 				</div>
-				{/* <TitleSeparator title="Praça de pagamento" />
-				<div className="grid grid-cols-4 gap-4">
-					<FormField
-						control={dadosGeraisForm.control}
-						name="pracaCep"
-						render={({ field: { onChange, ...props } }) => (
-							<FormItem>
-								<Input
-									placeholder="CEP"
-									onChange={(e) => {
-										const { value } = e.target;
-										e.target.value = formatCep(value);
-										onChange(e);
-										clearErrors("pracaCep");
-									}}
-									{...props}
-								/>
-								{errors.pracaCep && (
-									<FormDescription className="text-destructive">
-										{errors.pracaCep.message}
-									</FormDescription>
-								)}
-							</FormItem>
-						)}
-					/>
-					<FormField
-						control={dadosGeraisForm.control}
-						name="pracaRua"
-						render={({ field: { onChange, ...props } }) => (
-							<FormItem>
-								<Input
-									placeholder="Rua"
-									onChange={(e) => {
-										onChange(e);
-										clearErrors("pracaRua");
-									}}
-									{...props}
-									disabled
-								/>
-								{errors.pracaRua && (
-									<FormDescription className="text-destructive">
-										{errors.pracaRua.message}
-									</FormDescription>
-								)}
-							</FormItem>
-						)}
-					/>
-					<FormField
-						control={dadosGeraisForm.control}
-						name="pracaNumero"
-						render={({ field: { onChange, ...props } }) => (
-							<FormItem>
-								<Input
-									placeholder="Número"
-									onChange={(e) => {
-										onChange(e);
-										clearErrors("pracaNumero");
-									}}
-									{...props}
-								/>
-								{errors.pracaNumero && (
-									<FormDescription className="text-destructive">
-										{errors.pracaNumero.message}
-									</FormDescription>
-								)}
-							</FormItem>
-						)}
-					/>
-					<div />
-					<FormField
-						control={dadosGeraisForm.control}
-						name="pracaComplemento"
-						render={({ field: { onChange, ...props } }) => (
-							<FormItem>
-								<Input
-									placeholder="Complemento"
-									onChange={(e) => {
-										onChange(e);
-										clearErrors("pracaComplemento");
-									}}
-									{...props}
-								/>
-								{errors.pracaComplemento && (
-									<FormDescription className="text-destructive">
-										{errors.pracaComplemento.message}
-									</FormDescription>
-								)}
-							</FormItem>
-						)}
-					/>
-					<FormField
-						control={dadosGeraisForm.control}
-						name="pracaBairro"
-						render={({ field: { onChange, ...props } }) => (
-							<FormItem>
-								<Input
-									placeholder="Bairro"
-									onChange={(e) => {
-										onChange(e);
-										clearErrors("pracaBairro");
-									}}
-									{...props}
-									disabled
-								/>
-								{errors.pracaBairro && (
-									<FormDescription className="text-destructive">
-										{errors.pracaBairro.message}
-									</FormDescription>
-								)}
-							</FormItem>
-						)}
-					/>
-					<FormField
-						control={dadosGeraisForm.control}
-						name="pracaCidade"
-						render={({ field: { onChange, ...props } }) => (
-							<FormItem>
-								<Input
-									placeholder="Cidade"
-									onChange={(e) => {
-										onChange(e);
-										clearErrors("pracaCidade");
-									}}
-									{...props}
-									disabled
-								/>
-								{errors.pracaCidade && (
-									<FormDescription className="text-destructive">
-										{errors.pracaCidade.message}
-									</FormDescription>
-								)}
-							</FormItem>
-						)}
-					/>
-					<FormField
-						control={dadosGeraisForm.control}
-						name="pracaEstado"
-						render={({ field: { onChange, ...props } }) => (
-							<FormItem>
-								<Input
-									placeholder="UF"
-									onChange={(e) => {
-										onChange(e);
-										clearErrors("pracaEstado");
-									}}
-									{...props}
-									disabled
-								/>
-								{errors.pracaEstado && (
-									<FormDescription className="text-destructive">
-										{errors.pracaEstado.message}
-									</FormDescription>
-								)}
-							</FormItem>
-						)}
-					/>
-				</div> */}
 				<TitleSeparator title="Contato" />
 				<div className="grid grid-cols-4 gap-4">
 					<FormField
@@ -736,7 +567,7 @@ export function FormularioDadosGerais({
 							<FormItem>
 								<Input
 									placeholder="Telefone comercial"
-									maxLength={15} 
+									maxLength={15}
 									onChange={(e) => {
 										const { value } = e.target;
 										e.target.value = formatTelefone(value);
@@ -760,7 +591,7 @@ export function FormularioDadosGerais({
 							<FormItem>
 								<Input
 									placeholder="Telefone"
-									maxLength={15} 
+									maxLength={15}
 									onChange={(e) => {
 										const { value } = e.target;
 										e.target.value = formatTelefone(value);
