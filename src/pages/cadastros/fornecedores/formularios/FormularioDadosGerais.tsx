@@ -170,7 +170,8 @@ export function FormularioDadosGerais({
 						name="codigo"
 						render={({ field }) => (
 							<FormItem>
-								<Input placeholder="Código" {...field} disabled />
+								<FormLabel>Código</FormLabel>
+								<Input {...field} disabled />
 							</FormItem>
 						)}
 					/>
@@ -179,6 +180,7 @@ export function FormularioDadosGerais({
 						name="nome"
 						render={({ field: { onChange, ...props } }) => (
 							<FormItem>
+								<FormLabel>Nome</FormLabel>
 								<Input
 									placeholder="Nome"
 									{...props}
@@ -200,8 +202,9 @@ export function FormularioDadosGerais({
 						name="identificador"
 						render={({ field: { onChange, ...props } }) => (
 							<FormItem>
+								<FormLabel>Identificador</FormLabel>
 								<Input
-									placeholder={"CNPJ/CPF"}
+
 									onChange={(e) => {
 										const { value } = e.target;
 										e.target.value = formatCpfCnpj(value);
@@ -226,8 +229,9 @@ export function FormularioDadosGerais({
 						name="estadualrg"
 						render={({ field: { onChange, ...props } }) => (
 							<FormItem >
+								<FormLabel>IE</FormLabel>
 								<Input
-									placeholder="IE"
+
 									onChange={(e) => {
 										onChange(e);
 										clearErrors("estadualrg");
@@ -247,6 +251,7 @@ export function FormularioDadosGerais({
 						name="tipoie"
 						render={({ field: { onChange, ...props } }) => (
 							<FormItem className="col-span-2">
+								<FormLabel>Tipo IE</FormLabel>
 								<Select
 									onValueChange={(e) => {
 										clearErrors("tipoie");
@@ -255,7 +260,7 @@ export function FormularioDadosGerais({
 									value={props.value}
 								>
 									<SelectTrigger>
-										<SelectValue placeholder="Tipo de IE" />
+										<SelectValue />
 									</SelectTrigger>
 									<SelectContent>
 										{Object.entries(tiposIELabelHash).map(([key, label]) => (
@@ -280,6 +285,7 @@ export function FormularioDadosGerais({
 						name="contaContabil"
 						render={({ field: { onChange, value } }) => (
 							<FormItem className="col-span-2">
+								<FormLabel>Conta Contábil</FormLabel>
 								<Select
 									onValueChange={(val) => {
 										clearErrors("contaContabil");
@@ -324,8 +330,9 @@ export function FormularioDadosGerais({
 						name="cep"
 						render={({ field: { onChange, ...props } }) => (
 							<FormItem>
+								<FormLabel>CEP</FormLabel>
 								<Input
-									placeholder="CEP"
+
 									onChange={(e) => {
 										const { value } = e.target;
 										e.target.value = formatCep(value);
@@ -347,8 +354,9 @@ export function FormularioDadosGerais({
 						name="rua"
 						render={({ field: { onChange, ...props } }) => (
 							<FormItem>
+								<FormLabel>Rua</FormLabel>
 								<Input
-									placeholder="Rua"
+
 									onChange={(e) => {
 										onChange(e);
 										clearErrors("rua");
@@ -369,8 +377,9 @@ export function FormularioDadosGerais({
 						name="numero"
 						render={({ field: { onChange, ...props } }) => (
 							<FormItem>
+								<FormLabel>Número</FormLabel>
 								<Input
-									placeholder="Número"
+
 									onChange={(e) => {
 										onChange(e);
 										clearErrors("numero");
@@ -391,8 +400,8 @@ export function FormularioDadosGerais({
 						name="complemento"
 						render={({ field: { onChange, ...props } }) => (
 							<FormItem>
+								<FormLabel>Complemento</FormLabel>
 								<Input
-									placeholder="Complemento"
 									onChange={(e) => {
 										onChange(e);
 										clearErrors("complemento");
@@ -412,8 +421,8 @@ export function FormularioDadosGerais({
 						name="bairro"
 						render={({ field: { onChange, ...props } }) => (
 							<FormItem>
+								<FormLabel>Bairro</FormLabel>
 								<Input
-									placeholder="Bairro"
 									onChange={(e) => {
 										onChange(e);
 										clearErrors("bairro");
@@ -434,8 +443,8 @@ export function FormularioDadosGerais({
 						name="cidade"
 						render={({ field: { onChange, ...props } }) => (
 							<FormItem>
+								<FormLabel>Cidade</FormLabel>
 								<Input
-									placeholder="Cidade"
 									onChange={(e) => {
 										onChange(e);
 										clearErrors("cidade");
@@ -456,8 +465,8 @@ export function FormularioDadosGerais({
 						name="estado"
 						render={({ field: { onChange, ...props } }) => (
 							<FormItem>
+								<FormLabel>UF</FormLabel>
 								<Input
-									placeholder="UF"
 									onChange={(e) => {
 										onChange(e);
 										clearErrors("estado");
@@ -478,8 +487,8 @@ export function FormularioDadosGerais({
 						name="observacao"
 						render={({ field: { onChange, ...props } }) => (
 							<FormItem>
+								<FormLabel>Observação</FormLabel>
 								<Input
-									placeholder="Observação"
 									onChange={(e) => {
 										onChange(e);
 										clearErrors("observacao");
@@ -499,8 +508,8 @@ export function FormularioDadosGerais({
 						name="segmento"
 						render={({ field: { onChange, ...props } }) => (
 							<FormItem>
+								<FormLabel>Segmento</FormLabel>
 								<Input
-									placeholder="Segmento"
 									onChange={(e) => {
 										onChange(e);
 										clearErrors("segmento");
@@ -520,8 +529,8 @@ export function FormularioDadosGerais({
 						name="nomeFantasia"
 						render={({ field: { onChange, ...props } }) => (
 							<FormItem>
+								<FormLabel>Fantasia</FormLabel>
 								<Input
-									placeholder="Fantasia"
 									onChange={(e) => {
 										onChange(e);
 										clearErrors("nomeFantasia");
@@ -544,8 +553,8 @@ export function FormularioDadosGerais({
 						name="nomeContato"
 						render={({ field: { onChange, ...props } }) => (
 							<FormItem>
+								<FormLabel>Nome Contato</FormLabel>
 								<Input
-									placeholder="Nome do contato"
 									onChange={(e) => {
 										onChange(e);
 										clearErrors("nomeContato");
@@ -565,8 +574,8 @@ export function FormularioDadosGerais({
 						name="telefone1"
 						render={({ field: { onChange, ...props } }) => (
 							<FormItem>
+								<FormLabel>Telefone 1</FormLabel>
 								<Input
-									placeholder="Telefone comercial"
 									maxLength={15}
 									onChange={(e) => {
 										const { value } = e.target;
@@ -589,8 +598,8 @@ export function FormularioDadosGerais({
 						name="telefone2"
 						render={({ field: { onChange, ...props } }) => (
 							<FormItem>
+								<FormLabel>Telefone 2</FormLabel>
 								<Input
-									placeholder="Telefone"
 									maxLength={15}
 									onChange={(e) => {
 										const { value } = e.target;
@@ -614,8 +623,8 @@ export function FormularioDadosGerais({
 						name="site"
 						render={({ field: { onChange, ...props } }) => (
 							<FormItem className="col-span-2">
+								<FormLabel>Site</FormLabel>
 								<Input
-									placeholder="Site"
 									onChange={(e) => {
 										onChange(e);
 										clearErrors("site");
@@ -636,8 +645,8 @@ export function FormularioDadosGerais({
 						name="emailComercial"
 						render={({ field: { onChange, ...props } }) => (
 							<FormItem className="col-span-2">
+								<FormLabel>E-mail comercial</FormLabel>
 								<Input
-									placeholder="E-mail comercial"
 									onChange={(e) => {
 										onChange(e);
 										clearErrors("emailComercial");
@@ -657,8 +666,8 @@ export function FormularioDadosGerais({
 						name="emailFiscal"
 						render={({ field: { onChange, ...props } }) => (
 							<FormItem className="col-span-2">
+								<FormLabel>E-mail fiscal</FormLabel>
 								<Input
-									placeholder="E-mail fiscal"
 									onChange={(e) => {
 										onChange(e);
 										clearErrors("emailFiscal");

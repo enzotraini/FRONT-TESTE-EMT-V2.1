@@ -17,22 +17,29 @@ import { AxiosError } from "axios";
 import { Loader, RotateCw } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm, UseFormReturn } from "react-hook-form";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { z } from "zod";
-import { listarClassifisc, listarCsosn, listarAtributo, ListarResponse } from "@/api/fiscal/listas-produto";
+import { listarClassifisc, listarCsosn, listarAtributo, ListarResponse, BuscarCorridasResponse, buscarCorridas } from "@/api/fiscal/listas-produto";
 import dayjs from "dayjs";
 import { criarProdutoService } from "@/api/produto/criar-service";
 import { toast } from "sonner";
 import { editarProduto } from "@/api/produto/editar-produto";
 
+
 type DadosGerais = BuscarDadosCompletosDoProdutoResponse["dadosGerais"];
 //type DadosAdicionais = BuscarDadosCompletosDoProdutoResponse["dadosAdicionais"];
+
+//modal corrida
+//const [modalAberto, setModalAberto] = useState(false);
 
 type Transformations<T> = Partial<{
 	[K in keyof T]: (value: T[K]) => T[K] | undefined;
 }>;
 
 const transformationsDadosGerais: Transformations<DadosGerais> = {};
+
+
+
 
 //const transformationsDadosAdicionais: Transformations<DadosAdicionais> = {};
 
@@ -330,6 +337,31 @@ export function FormularioProduto() {
 		},
 	});
 
+	const [modalAberto, setModalAberto] = useState(false);
+	const [searchCorrida, setSearchCorrida] = useState("");
+	const [pageCorrida, setPageCorrida] = useState(1);
+	const [searchParams, setSearchParams] = useSearchParams();
+	const [corridaSelecionada, setCorridaSelecionada] = useState("");
+
+	const {
+		data: corridaData,
+		isFetching: carregandoCorrida,
+	} = useQuery<BuscarCorridasResponse>({
+		queryKey: ["listar-corridas", searchCorrida, pageCorrida],
+		queryFn: () => buscarCorridas({ search: searchCorrida, page: pageCorrida, perPage: 10 }),
+		enabled: searchCorrida === "" || searchCorrida.length >= 2,
+	});
+
+	const handlePageChangeCorrida = async (page: number) => {
+		if (page < 1) page = 1;
+		setPageCorrida(page);
+		setSearchParams((prev) => {
+			const newParams = new URLSearchParams(prev);
+			newParams.set("page", page.toString());
+			return newParams;
+		});
+	};
+
 	useEffect(() => {
 		if (!dadosDoProduto || !dadosDoProduto.dadosGerais) return;
 
@@ -448,6 +480,7 @@ export function FormularioProduto() {
 		// 	setValueDadosGerais(key, valor ?? "");
 		// }	
 	}
+
 	return (
 		<div className="flex flex-col gap-4">
 			<div className="flex justify-between items-center">
@@ -490,6 +523,16 @@ export function FormularioProduto() {
 				carregandoCsosn={carregandoCsosn}
 				setSearchCsosn={setSearchCsosn}
 				searchCsosn={searchCsosn}
+
+				corridaData={corridaData}
+				carregandoCorrida={carregandoCorrida}
+				setSearchCorrida={setSearchCorrida}
+				searchCorrida={searchCorrida}
+				modalAberto={modalAberto}
+				setModalAberto={setModalAberto}
+				handlePageChangeCorrida={handlePageChangeCorrida}
+				corridaSelecionada={corridaSelecionada}
+				setCorridaSelecionada={setCorridaSelecionada}
 			/>
 
 		</div>
