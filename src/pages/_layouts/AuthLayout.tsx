@@ -10,14 +10,14 @@ export function AuthLayout() {
 			<div className="p-6 bg-muted flex flex-col justify-between items-start w-[60%] h-screen">
 				<header className="flex gap-2 flex-col">
 					<h1 className="text-xl text-accent-foreground text-b font-bold">
-						Aço Fácil
+						EMT Consultoria
 					</h1>
 					<p className="text-muted-foreground">Seja bem-vindo</p>
 				</header>
 
 				<footer>
 					<p className="text-muted-foreground">
-						Todos os direitos reservados &copy; EMT Informática -{" "}
+						Todos os direitos reservados &copy; EMT Consultoria -{" "}
 						{new Date().getFullYear()}
 					</p>
 				</footer>

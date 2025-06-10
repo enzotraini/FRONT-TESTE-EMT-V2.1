@@ -71,7 +71,7 @@ api.interceptors.response.use(
 		if (error.response?.status === 401) {
 			console.log("[axios] Erro 401 - Limpando cookies e redirecionando...");
 			clearAllCookies();
-			window.location.href = "/auth/sign-in";
+			//window.location.href = "/auth/sign-in";
 			return Promise.reject(error);
 		}
 
