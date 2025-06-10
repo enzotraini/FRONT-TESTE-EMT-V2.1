@@ -99,7 +99,6 @@ export function SignIn() {
 					headers: error.response?.headers,
 					config: error.config,
 				});
-				debugger
 				if (error.response?.status === 401) {
 					toast.error("Email ou senha inválidos");
 				} else if (error.message === "Network Error") {

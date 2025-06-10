@@ -400,7 +400,6 @@ export function FormularioProduto() {
 
 
 	const handleSave = async () => {
-		debugger;
 
 		// Validar formulário
 		const dadosGeraisValidos = await dadosGeraisForm.trigger();
