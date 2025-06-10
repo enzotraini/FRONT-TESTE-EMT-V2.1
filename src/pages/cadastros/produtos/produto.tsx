@@ -39,10 +39,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import React from "react";
+import { Pagination as PaginationRoot, PaginationContent, PaginationEllipsis, PaginationItem, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 
 const buscarProdutosFormSchema = z.object({
 	search: z.string().optional(),
 });
+
+
 
 export function Produtos() {
 	const navigate = useNavigate();
@@ -83,27 +86,45 @@ export function Produtos() {
 
 	const perPage = 10;
 
-	const {
-		data: buscarProdutosResponse,
-		isFetching: buscandoProdutos,
-	} = useQuery<BuscarProdutosResponse>({
-		queryKey: ["produtos", page, perPage, debouncedSearch],
+	// const {
+	// 	data: buscarProdutosResponse,
+	// 	isFetching: buscandoProdutos,
+	// } = useQuery<BuscarProdutosResponse>({
+	// 	queryKey: ["produtos", page, perPage, debouncedSearch],
+	// 	queryFn: () => buscarProdutos({ page, perPage, search: debouncedSearch }),
+	// 	enabled: debouncedSearch.length >= 3 || debouncedSearch === "",
+	// 	staleTime: 0,
+	// });
+
+	const { data, isFetching } = useQuery({
+		queryKey: ['produtos', page, perPage, debouncedSearch],
 		queryFn: () => buscarProdutos({ page, perPage, search: debouncedSearch }),
-		enabled: debouncedSearch.length >= 3 || debouncedSearch === "",
-		staleTime: 0,
-	});
+		enabled: debouncedSearch.length >= 3 || debouncedSearch === '',
+	})
+
+
 
 
 	const { mutateAsync: deletarProdutoFn } = useMutation({
 		mutationFn: deletarProduto,
 	});
 
+	// useEffect(() => {
+	// 	if (debouncedSearch.length >= 3 || debouncedSearch === "") {
+	// 		setSearchParams((prev) => {
+	// 			prev.set("page", "1");
+	// 			prev.set("search", debouncedSearch);
+	// 			return prev;
+	// 		});
+	// 	}
+	// }, [debouncedSearch, setSearchParams]);
+
 	useEffect(() => {
-		if (debouncedSearch.length >= 3 || debouncedSearch === "") {
+		if (debouncedSearch.length >= 3 || debouncedSearch.length === 0) {
 			setSearchParams((prev) => {
-				prev.set("page", "1");
-				prev.set("search", debouncedSearch);
-				return prev;
+				const newParams = new URLSearchParams(prev);
+				newParams.set("search", debouncedSearch); // mantém a page atual!
+				return newParams;
 			});
 		}
 	}, [debouncedSearch, setSearchParams]);
@@ -123,14 +144,97 @@ export function Produtos() {
 	type BuscarProdutosData = z.infer<typeof buscarProdutosFormSchema>;
 
 	const podeExibirResultados = debouncedSearch.length >= 3 || debouncedSearch === "";
-	const _produtos = buscarProdutosResponse?.produtos ?? [];
+	const _produtos = data?.produtos ?? [];
+
+	//paginação
+	//const [searchParams, setSearchParams] = useSearchParams()
+	//const page = Number(searchParams.get('page') ?? 1)
+	//const perPage = Number(searchParams.get('perPage') ?? 10)
+
+	// src/types/produto.ts  (exemplo de local)
+
+	interface Produto {
+		sr_recno: number
+		codprod: string
+		tipo: string
+		secao: string
+		bitola: string
+		acab: string
+		corrida: string
+		estqatual: number
+		uni: string
+		tipoaco: string
+		local: string
+		tratamento: string
+		obs: string
+		tributo: string
+		classifisc: string
+		fornecedor: string
+		tipomaterial: string
+		codbloco: string
+		Registro: string
+	}
+
+
+	interface BuscarProdutosResponse {
+		data: Produto[]
+		meta: {
+			page: number
+			perPage: number
+			total: number
+		}
+	}
+
+	type PaginationProps = {
+		page: number
+		perPage: number
+		total: number
+		onPageChange: (next: number) => void
+	}
+
+	function Pagination({ page, perPage, total, onPageChange }: PaginationProps) {
+		const totalPages = Math.max(1, Math.ceil(total / perPage))
+		return (
+			<div className="flex items-center justify-end gap-2 p-4">
+				<Button
+					variant="outline"
+					size="icon"
+					disabled={page === 1}
+					onClick={() => onPageChange(page - 1)}
+				>
+					‹
+				</Button>
+				<span className="text-sm">
+					{page} / {totalPages}
+				</span>
+				<Button
+					variant="outline"
+					size="icon"
+					disabled={page === totalPages}
+					onClick={() => onPageChange(page + 1)}
+				>
+					›
+				</Button>
+			</div>
+		)
+	}
+
+	async function handlePageChange(page: number) {
+		if (page < 1) page = 1;
+		setSearchParams((prev) => {
+			prev.set("page", page.toString());
+			return prev;
+		});
+	}
+
+
 
 
 	return (
 		<div className="flex flex-col gap-6">
 			<div className="flex items-center justify-between">
 				<h1 className="text-2xl font-bold">Produto</h1>
-				<Link to="/cadastros/transportadoras/novo">
+				<Link to="/cadastros/produtos/novo">
 					<Button>
 						<Plus className="mr-2 h-4 w-4" />
 						Novo Produto
@@ -207,26 +311,42 @@ export function Produtos() {
 											</td>
 
 											{/* ações */}
-											<td className="p-2 text-center flex justify-center items-center">
+											<td className="p-2">
 												<DropdownMenu>
 													<DropdownMenuTrigger asChild>
-														<Button variant="ghost" size="icon">
+														{/* 1. Botão com fundo branco */}
+														<Button
+															variant="ghost"
+															size="icon"
+															className="bg-white hover:bg-gray-100"
+														>
 															<MoreHorizontal className="h-4 w-4" />
 														</Button>
 													</DropdownMenuTrigger>
-													<DropdownMenuContent align="end">
-														<DropdownMenuItem onClick={() => handleEditar(row.sr_recno)}>
+
+													{/* 2. Caixa do dropdown também branca (opcional) */}
+													<DropdownMenuContent
+														align="end"
+														className="p-4 bg-white border shadow-lg p-0 w-20"
+													>
+														{/* itens com fundo branco e hover cinza-claro */}
+														<DropdownMenuItem
+															onClick={() => handleEditar(row.sr_recno)}
+															className="mb-2 bg-white hover:bg-gray-100 focus:bg-gray-100"
+														>
 															<Pencil className="mr-2 h-4 w-4" /> Editar
 														</DropdownMenuItem>
+
 														<DropdownMenuItem
-															className="text-destructive"
 															onClick={() => handleExcluir(row.sr_recno, row.codprod)}
+															className="bg-white text-destructive hover:bg-gray-100 focus:bg-gray-100"
 														>
 															<Trash2 className="mr-2 h-4 w-4" /> Excluir
 														</DropdownMenuItem>
 													</DropdownMenuContent>
 												</DropdownMenu>
 											</td>
+
 
 										</tr>
 
@@ -240,7 +360,7 @@ export function Produtos() {
 														<div><strong>Fornecedor:</strong> {row.fornecedor}</div>
 														<div><strong>Tipo Material:</strong> {row.tipomaterial}</div>
 														<div><strong>Cod. Bloco:</strong> {row.codbloco}</div>
-														<div><strong>Registro:</strong> {row.Registro}</div>
+														<div><strong>Registro:</strong> {row?.Registro}</div>
 													</div>
 												</td>
 											</tr>
@@ -251,6 +371,144 @@ export function Produtos() {
 							</tbody>
 						</table>
 					</div>
+
+					{data && (
+
+
+						<PaginationRoot className="justify-end p-6">
+							<PaginationContent>
+								<PaginationItem>
+									<PaginationPrevious
+										onClick={() => {
+											handlePageChange(data.meta?.page - 1);
+										}}
+										isActive={data.meta?.page === 1}
+									/>
+								</PaginationItem>
+								{data.meta?.page < 3 &&
+									Array.from({ length: Math.min(3, data.meta?.total) })
+										.map((_, index) => index + 1)
+										.map((pageNumber) => (
+											<PaginationItem key={pageNumber}>
+												<Button
+													onClick={() => {
+														handlePageChange(pageNumber);
+													}}
+													disabled={pageNumber === data.meta?.page}
+												>
+													{pageNumber}
+												</Button>
+											</PaginationItem>
+										))}
+								{data.meta?.page < 3 && data.meta?.total > 5 && (
+									<>
+										<PaginationItem>
+											<PaginationEllipsis />
+										</PaginationItem>
+										<PaginationItem>
+											<Button
+												onClick={() => {
+													handlePageChange(data.meta?.total);
+												}}
+											>
+												{data.meta?.total}
+											</Button>
+										</PaginationItem>
+									</>
+								)}
+								{data.meta?.page > 2 && data.meta?.page < data.meta?.total - 2 && (
+									<>
+										<PaginationItem>
+											<Button
+												onClick={() => {
+													handlePageChange(1);
+												}}
+											>
+												1
+											</Button>
+										</PaginationItem>
+										<PaginationItem>
+											<PaginationEllipsis />
+										</PaginationItem>
+										<PaginationItem>
+											<Button
+												onClick={() => {
+													handlePageChange(data.meta?.page - 1);
+												}}
+											>
+												{data.meta?.page - 1}
+											</Button>
+										</PaginationItem>
+										<PaginationItem>
+											<Button disabled>{data.meta?.page}</Button>
+										</PaginationItem>
+										<PaginationItem>
+											<Button
+												onClick={() => {
+													handlePageChange(data.meta?.page + 1);
+												}}
+											>
+												{data.meta?.page + 1}
+											</Button>
+										</PaginationItem>
+										<PaginationItem>
+											<PaginationEllipsis />
+										</PaginationItem>
+										<PaginationItem>
+											<Button
+												onClick={() => {
+													handlePageChange(data.meta?.total);
+												}}
+											>
+												{data.meta?.total}
+											</Button>
+										</PaginationItem>
+									</>
+								)}
+								{data.meta?.page > 3 && data.meta?.page >= data.meta?.total - 2 && (
+									<>
+										<PaginationItem>
+											<Button
+												onClick={() => {
+													handlePageChange(1);
+												}}
+											>
+												1
+											</Button>
+										</PaginationItem>
+										<PaginationItem>
+											<PaginationEllipsis />
+										</PaginationItem>
+									</>
+								)}
+								{data.meta?.page > 3 &&
+									data.meta?.page >= data.meta?.total - 2 &&
+									[data.meta?.total - 2, data.meta?.total - 1, data.meta?.total].map(
+										(pageNumber) => (
+											<PaginationItem key={pageNumber}>
+												<Button
+													onClick={() => {
+														handlePageChange(pageNumber);
+													}}
+													disabled={data.meta?.page === pageNumber}
+												>
+													{pageNumber}
+												</Button>
+											</PaginationItem>
+										),
+									)}
+								<PaginationItem>
+									<PaginationNext
+										onClick={() => {
+											handlePageChange(data.meta?.page + 1);
+										}}
+										isActive={data.meta?.page === data.meta?.total}
+									/>
+								</PaginationItem>
+							</PaginationContent>
+						</PaginationRoot>
+
+					)}
 				</CardContent>
 			</Card>
 		</div>

@@ -17,7 +17,7 @@ import { AxiosError } from "axios";
 import { Loader, RotateCw } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm, useFormContext, UseFormReturn } from "react-hook-form";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { z } from "zod";
 import { listarClassifisc, listarCsosn, listarAtributo, ListarResponse, BuscarCorridasResponse, buscarCorridas } from "@/api/fiscal/listas-produto";
 import dayjs from "dayjs";
@@ -511,6 +511,11 @@ export function FormularioProduto() {
 					{produtoId ? "Editar Produto" : "Novo Produto"}
 				</h1>
 				<div className="flex gap-2">
+					<Link to="/cadastros/produtos">
+						<Button type="button" variant="outline" className="h-10">
+							Cancelar
+						</Button>
+					</Link>
 					{produtoId ? "" :
 						<Button
 							variant="outline"
