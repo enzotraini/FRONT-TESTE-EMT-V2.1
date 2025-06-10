@@ -16,7 +16,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { Loader, RotateCw } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useForm, UseFormReturn } from "react-hook-form";
+import { useForm, useFormContext, UseFormReturn } from "react-hook-form";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { z } from "zod";
 import { listarClassifisc, listarCsosn, listarAtributo, ListarResponse, BuscarCorridasResponse, buscarCorridas } from "@/api/fiscal/listas-produto";
@@ -87,7 +87,11 @@ export const dadosGeraisFormSchema = z.object({
 	unidadeblocok: z.string().max(2).optional(),            // UNIDBLOCOK
 	codprodutoblocok: z.string().max(20).optional(),           // COD_ITEM_K
 
-	corrida: z.string().max(15).optional(),
+	corrida: z
+		.string()
+		.max(15, { message: "Máximo de 15 caracteres" })
+		.optional()
+		.or(z.literal("")),
 	tipoaco: z.string().max(2).optional(),
 	tratamento: z.string().max(3).optional(),
 
@@ -342,6 +346,7 @@ export function FormularioProduto() {
 	const [pageCorrida, setPageCorrida] = useState(1);
 	const [searchParams, setSearchParams] = useSearchParams();
 	const [corridaSelecionada, setCorridaSelecionada] = useState("");
+	//const { setError, clearErrors } = useFormContext();
 
 	const {
 		data: corridaData,
@@ -362,6 +367,22 @@ export function FormularioProduto() {
 		});
 	};
 
+	// async function validarCorrida() {
+	// 	if (!corridaSelecionada) return;
+
+	// 	try {
+	// 		const resultado = await buscarCorridas({ search: corridaSelecionada, page: 1, perPage: 1 });
+
+	// 		if (!resultado.corridas || resultado.corridas.length === 0) {
+	// 			setError("corrida", { message: "Corrida inexistente na base" });
+	// 		} else {
+	// 			clearErrors("corrida");
+	// 		}
+	// 	} catch (error) {
+	// 		setError("corrida", { message: "Erro ao validar corrida" });
+	// 	}
+	// }
+
 	useEffect(() => {
 		if (!dadosDoProduto || !dadosDoProduto.dadosGerais) return;
 
@@ -374,6 +395,8 @@ export function FormularioProduto() {
 			setValueDadosGerais(key, valor);
 		}
 	}, [dadosDoProduto, setValueDadosGerais]);
+
+
 
 
 	const handleSave = async () => {
@@ -533,6 +556,7 @@ export function FormularioProduto() {
 				handlePageChangeCorrida={handlePageChangeCorrida}
 				corridaSelecionada={corridaSelecionada}
 				setCorridaSelecionada={setCorridaSelecionada}
+			//validarCorrida={validarCorrida}
 			/>
 
 		</div>

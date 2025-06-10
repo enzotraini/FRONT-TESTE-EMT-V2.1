@@ -1,6 +1,6 @@
 import { Input } from "@/components/ui/input";
 import { z } from "zod";
-import { useForm, UseFormReturn } from "react-hook-form";
+import { useForm, useFormContext, UseFormReturn } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { Form, FormField, FormItem, FormDescription, FormControl, FormLabel } from "@/components/ui/form";
@@ -11,7 +11,7 @@ import { Switch } from "@/components/ui/switch";
 import InputMask from "react-input-mask";
 import dayjs from "dayjs";
 import { DadosGeraisForm } from "@/pages/cadastros/produtos/formularios/FormularioDeProduto";
-import { BuscarCorridasResponse, listarClassifisc, ListarResponse } from "@/api/fiscal/listas-produto";
+import { buscarCorridas, BuscarCorridasResponse, listarClassifisc, ListarResponse } from "@/api/fiscal/listas-produto";
 import { NumericFormat } from 'react-number-format';
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { DataTable } from "@/components/DataTable";
@@ -207,7 +207,6 @@ export function FormularioDadosGerais({ dadosGeraisForm,
 			),
 		},
 	];
-
 
 	return (
 
@@ -566,21 +565,67 @@ export function FormularioDadosGerais({ dadosGeraisForm,
 					</div>
 					<TitleSeparator title="Preço e Custo" />
 					<div className="grid grid-cols-4 gap-4">
-						<FormField name="corrida" control={control} render={({ field }) => (
-							<FormItem>
-								<FormLabel>Corrida</FormLabel>
-								<Input
-									value={corridaSelecionada}
-									readOnly
-									onClick={() => {
-										setFiltroCorrida("");     // limpa o filtro
-										setSearchCorrida("");     // carrega todos os dados da grid com page = 1
-										setModalAberto(true);     // abre o modal
-									}}
-									placeholder="Selecionar corrida"
-								/>
-							</FormItem>
-						)} />
+						<FormField
+							name="corrida"
+							control={dadosGeraisForm.control}
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Corrida</FormLabel>
+									<div className="flex items-center gap-2">
+										<Input
+											{...field}
+											value={corridaSelecionada}
+											onChange={(e) => {
+												const valor = e.target.value;
+												field.onChange(valor);
+												setCorridaSelecionada(valor);
+												dadosGeraisForm.clearErrors("corrida");
+											}}
+											onBlur={async () => {
+												//if (!corridaSelecionada) return;
+
+												const response = await buscarCorridas({
+													search: corridaSelecionada,
+													page: 1,
+													perPage: 1,
+												});
+
+												const corridaEncontrada = response?.corridas?.[0];
+
+												if (!corridaEncontrada) {
+													dadosGeraisForm.setError("corrida", {
+														type: "manual",
+														message: "Corrida inexistente na base",
+													});
+												} else {
+													dadosGeraisForm.clearErrors("corrida");
+												}
+											}}
+										/>
+
+										<button
+											type="button"
+											onClick={() => {
+												setFiltroCorrida("");
+												setSearchCorrida("");
+												setModalAberto(true);
+											}}
+											className="p-2 border rounded text-gray-600 hover:bg-gray-100"
+											title="Buscar Corrida"
+										>
+											🔍
+										</button>
+									</div>
+
+									{dadosGeraisForm.formState.errors.corrida && (
+										<FormDescription className="text-destructive">
+											{dadosGeraisForm.formState.errors.corrida.message}
+										</FormDescription>
+									)}
+								</FormItem>
+							)}
+						/>
+
 
 						<FormField name="tipoaco" control={control} render={({ field }) => (
 							<FormItem>
