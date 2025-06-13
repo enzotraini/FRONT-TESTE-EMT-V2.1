@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Plus, Search, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import { Plus, Search, MoreHorizontal, Pencil, Trash2, Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -10,8 +10,44 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { buscarTransportadoras } from "@/api/transportadoras/buscar-transportadoras";
+import { deletarTransportadora } from "@/api/transportadoras/deletar-transportadora";
+import { useState } from "react";
+import { toast } from "sonner";
 
 export function Transportadoras() {
+  const [page, setPage] = useState(1);
+  const [search, setSearch] = useState("");
+  const queryClient = useQueryClient();
+
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["transportadoras", page, search],
+    queryFn: () => buscarTransportadoras({ page, perPage: 10, search }),
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: deletarTransportadora,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["transportadoras"] });
+      toast.success("Transportadora deletada com sucesso!");
+    },
+    onError: (error) => {
+      toast.error("Erro ao deletar transportadora");
+      console.error(error);
+    },
+  });
+
+  const handleDelete = (id: number) => {
+    if (confirm("Tem certeza que deseja deletar esta transportadora?")) {
+      deleteMutation.mutate(id);
+    }
+  };
+
+  if (error) {
+    return <div className="text-red-500">Erro ao carregar transportadoras</div>;
+  }
+
   return (
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between">
@@ -34,6 +70,8 @@ export function Transportadoras() {
                 <Input
                   placeholder="Buscar transportadora..."
                   className="pl-8"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
                 />
               </div>
             </div>
@@ -52,76 +90,64 @@ export function Transportadoras() {
                 </tr>
               </thead>
               <tbody>
-                <tr className="border-b transition-colors hover:bg-muted/50">
-                  <td className="p-4">
-                    <div className="font-medium">Transportadora A</div>
-                    <div className="text-sm text-muted-foreground">São Paulo, SP</div>
-                  </td>
-                  <td className="p-4">00.000.000/0000-00</td>
-                  <td className="p-4">
-                    <div className="text-sm">(11) 99999-9999</div>
-                    <div className="text-sm text-muted-foreground">contato@transportadora-a.com</div>
-                  </td>
-                  <td className="p-4">
-                    <Badge variant="success">Ativo</Badge>
-                  </td>
-                  <td className="p-4 text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon">
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem asChild>
-                          <Link to="/cadastros/transportadoras/1" className="flex items-center">
-                            <Pencil className="mr-2 h-4 w-4" />
-                            Editar
-                          </Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem className="text-destructive">
-                          <Trash2 className="mr-2 h-4 w-4" />
-                          Excluir
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </td>
-                </tr>
-                <tr className="border-b transition-colors hover:bg-muted/50">
-                  <td className="p-4">
-                    <div className="font-medium">Transportadora B</div>
-                    <div className="text-sm text-muted-foreground">Rio de Janeiro, RJ</div>
-                  </td>
-                  <td className="p-4">11.111.111/1111-11</td>
-                  <td className="p-4">
-                    <div className="text-sm">(21) 98888-8888</div>
-                    <div className="text-sm text-muted-foreground">contato@transportadora-b.com</div>
-                  </td>
-                  <td className="p-4">
-                    <Badge variant="secondary">Inativo</Badge>
-                  </td>
-                  <td className="p-4 text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon">
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem asChild>
-                          <Link to="/cadastros/transportadoras/2" className="flex items-center">
-                            <Pencil className="mr-2 h-4 w-4" />
-                            Editar
-                          </Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem className="text-destructive">
-                          <Trash2 className="mr-2 h-4 w-4" />
-                          Excluir
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </td>
-                </tr>
+                {isLoading ? (
+                  <tr>
+                    <td colSpan={5} className="p-8 text-center">
+                      <Loader2 className="mx-auto h-6 w-6 animate-spin" />
+                      <p className="mt-2 text-sm text-muted-foreground">Carregando transportadoras...</p>
+                    </td>
+                  </tr>
+                ) : data?.transportadoras.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="p-8 text-center">
+                      <p className="text-sm text-muted-foreground">Nenhuma transportadora encontrada</p>
+                    </td>
+                  </tr>
+                ) : (
+                  data?.transportadoras.map((transportadora) => (
+                    <tr key={transportadora.id} className="border-b transition-colors hover:bg-muted/50">
+                      <td className="p-4">
+                        <div className="font-medium">{transportadora.nome}</div>
+                        <div className="text-sm text-muted-foreground">
+                          {transportadora.cidade}, {transportadora.estado}
+                        </div>
+                      </td>
+                      <td className="p-4">{transportadora.cgccpf}</td>
+                      <td className="p-4">
+                        <div className="text-sm">{transportadora.telefone1}</div>
+                        <div className="text-sm text-muted-foreground">{transportadora.email}</div>
+                      </td>
+                      <td className="p-4">
+                        <Badge variant="default">Ativo</Badge>
+                      </td>
+                      <td className="p-4 text-right">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon">
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem asChild>
+                              <Link to={`/cadastros/transportadoras/${transportadora.id}`} className="flex items-center">
+                                <Pencil className="mr-2 h-4 w-4" />
+                                Editar
+                              </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem 
+                              className="text-destructive"
+                              onClick={() => handleDelete(transportadora.id)}
+                              disabled={deleteMutation.isPending}
+                            >
+                              <Trash2 className="mr-2 h-4 w-4" />
+                              Excluir
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>

@@ -1,0 +1,1 @@
+export { AtendimentoCliente } from "./AtendimentoCliente"; 

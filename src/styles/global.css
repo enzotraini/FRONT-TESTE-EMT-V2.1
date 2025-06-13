@@ -27,8 +27,7 @@
     --chart-3: 197 37% 24%;
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
-    --radius: 0.5rem
-  ;
+    --radius: 0.5rem;
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
     --sidebar-primary: 240 5.9% 10%;
@@ -36,7 +35,8 @@
     --sidebar-accent: 240 4.8% 95.9%;
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%}
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
   .dark {
     --background: 240 10% 3.9%;
     --foreground: 0 0% 98%;
@@ -61,8 +61,7 @@
     --chart-2: 160 60% 45%;
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%
-  ;
+    --chart-5: 340 75% 55%;
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;
@@ -70,7 +69,8 @@
     --sidebar-accent: 240 3.7% 15.9%;
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%}
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
 }
 @layer base {
   * {
@@ -95,5 +95,53 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  /* Grid pattern sutil para o background */
+  .bg-grid-slate-100 {
+    background-image: linear-gradient(rgba(148, 163, 184, 0.08) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(148, 163, 184, 0.08) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+
+  .bg-grid-slate-800 {
+    background-image: linear-gradient(rgba(30, 41, 59, 0.2) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(30, 41, 59, 0.2) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+
+  .bg-grid-slate-900 {
+    background-image: linear-gradient(rgba(15, 23, 42, 0.15) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(15, 23, 42, 0.15) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+
+  /* Animações suaves personalizadas */
+  @keyframes gentle-float {
+    0%, 100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-4px);
+    }
+  }
+
+  .animate-gentle-float {
+    animation: gentle-float 6s ease-in-out infinite;
+  }
+
+  /* Efeito glass morphism sóbrio */
+  .glass {
+    backdrop-filter: blur(12px) saturate(150%);
+    background-color: rgba(255, 255, 255, 0.85);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+  }
+
+  .glass-dark {
+    backdrop-filter: blur(12px) saturate(150%);
+    background-color: rgba(15, 23, 42, 0.85);
+    border: 1px solid rgba(51, 65, 85, 0.3);
   }
 }

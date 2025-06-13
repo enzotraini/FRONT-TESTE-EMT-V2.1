@@ -212,7 +212,7 @@ export function FormularioDadosGerais({
 						name="codigo"
 						render={({ field }) => (
 							<FormItem>
-								<Input placeholder="Código" {...field} disabled />
+								<Input placeholder="Código" {...field} />
 							</FormItem>
 						)}
 					/>

@@ -17,6 +17,15 @@ import { FormularioFornecedor } from "@/pages/cadastros/fornecedores/formularios
 import { Fornecedores } from "@/pages/cadastros/fornecedores/fornecedor";
 import { Produtos } from "@/pages/cadastros/produtos/produto";
 import { FormularioProduto } from "@/pages/cadastros/produtos/formularios/FormularioDeProduto";
+import { AtendimentoCliente } from "@/pages/app/atendimento/AtendimentoCliente";
+import { Compras } from "@/pages/app/pedidos/compras";
+import { Vendas } from "@/pages/app/pedidos/vendas";
+import { ControleNotas } from "@/pages/app/nota-fiscal/controle";
+import { EmissaoNF } from "@/pages/app/nota-fiscal/emissao";
+import { ConsultaNFe } from "@/pages/app/nota-fiscal/consulta";
+import { KardexProdutos, KardexMateriaPrima, ListagemEstoque } from "@/pages/app/estoque";
+import { ContasReceber } from "@/pages/app/financeiro/contas-receber";
+import { ContasPagar } from "@/pages/app/financeiro/contas-pagar";
 //import { FormularioDadosGerais } from "@/pages/cadastros/fornecedores/formularios/FormularioDadosGerais";
 
 export const routes = createBrowserRouter([
@@ -140,6 +149,74 @@ export const routes = createBrowserRouter([
 			{
 				path: "/configuracoes",
 				element: <ConfiguracoesPage />,
+			},
+			{
+				path: "/atendimento-ao-cliente",
+				element: <AtendimentoCliente />,
+			},
+			{
+				path: "/pedidos",
+				element: <Outlet />,
+				children: [
+					{
+						path: "compras",
+						element: <Compras />,
+					},
+					{
+						path: "vendas",
+						element: <Vendas />,
+					},
+				],
+			},
+			{
+				path: "/nota-fiscal",
+				element: <Outlet />,
+				children: [
+					{
+						path: "controle",
+						element: <ControleNotas />,
+					},
+					{
+						path: "emissao",
+						element: <EmissaoNF />,
+					},
+					{
+						path: "consulta",
+						element: <ConsultaNFe />,
+					},
+				],
+			},
+			{
+				path: "/ficha-kardex",
+				element: <Outlet />,
+				children: [
+					{
+						path: "produtos",
+						element: <KardexProdutos />,
+					},
+					{
+						path: "materia-prima",
+						element: <KardexMateriaPrima />,
+					},
+					{
+						path: "listagem",
+						element: <ListagemEstoque />,
+					},
+				],
+			},
+			{
+				path: "/contas",
+				element: <Outlet />,
+				children: [
+					{
+						path: "receber",
+						element: <ContasReceber />,
+					},
+					{
+						path: "pagar",
+						element: <ContasPagar />,
+					},
+				],
 			},
 		],
 	},
