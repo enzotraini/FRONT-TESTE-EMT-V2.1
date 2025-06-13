@@ -515,15 +515,7 @@ export function FormularioProduto() {
 							Cancelar
 						</Button>
 					</Link>
-					{produtoId ? "" :
-						<Button
-							variant="outline"
-							onClick={handleReset}
-							disabled={carregandoDadosDoProduto}
-						>
-							<RotateCw className="h-4 w-4 mr-2" />
-							Resetar
-						</Button>}
+
 					<Button onClick={handleSave} disabled={carregandoDadosDoProduto}>
 						{carregandoDadosDoProduto ? (
 							<Loader className="h-4 w-4 mr-2 animate-spin" />

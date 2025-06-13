@@ -7,7 +7,7 @@ export interface BuscarFornecedoresParams {
 }
 
 export interface FornecedorDaListagem {
-	id: number;
+	codigo: number;
 	nome: string;
 	fantasia: string;
 	cgcfor: string;

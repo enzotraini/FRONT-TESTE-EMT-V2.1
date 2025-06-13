@@ -20,7 +20,7 @@ import { AxiosError } from "axios";
 import { Loader, RotateCw } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
 import { ListarResponse, listarDaContaContabil } from "@/api/fiscal/listas-produto";
 
@@ -295,15 +295,11 @@ export function FormularioFornecedor() {
 					{fornecedorId ? "Editar Fornecedor" : "Novo Fornecedor"}
 				</h1>
 				<div className="flex gap-2">
-					{fornecedorId ? "" :
-						<Button
-							variant="outline"
-							onClick={handleReset}
-							disabled={carregandoDadosDoFornecedor}
-						>
-							<RotateCw className="h-4 w-4 mr-2" />
-							Resetar
-						</Button>}
+					<Link to="/cadastros/fornecedores">
+						<Button type="button" variant="outline" className="h-10">
+							Cancelar
+						</Button>
+					</Link>
 					<Button onClick={handleSave} disabled={carregandoDadosDoFornecedor}>
 						{carregandoDadosDoFornecedor ? (
 							<Loader className="h-4 w-4 mr-2 animate-spin" />

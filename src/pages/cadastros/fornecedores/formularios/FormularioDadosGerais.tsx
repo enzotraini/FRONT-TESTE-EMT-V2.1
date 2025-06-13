@@ -644,7 +644,7 @@ export function FormularioDadosGerais({
 						control={dadosGeraisForm.control}
 						name="emailComercial"
 						render={({ field: { onChange, ...props } }) => (
-							<FormItem className="col-span-2">
+							<FormItem className="col-span-2 mb-6">
 								<FormLabel>E-mail comercial</FormLabel>
 								<Input
 									onChange={(e) => {
