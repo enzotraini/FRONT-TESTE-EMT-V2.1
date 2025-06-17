@@ -24,6 +24,7 @@ import dayjs from "dayjs";
 import { criarProdutoService } from "@/api/produto/criar-service";
 import { toast } from "sonner";
 import { editarProduto } from "@/api/produto/editar-produto";
+import { listarLocais } from "@/api/produto/lista-local";
 
 
 type DadosGerais = BuscarDadosCompletosDoProdutoResponse["dadosGerais"];
@@ -68,12 +69,7 @@ export const dadosGeraisFormSchema = z.object({
 	marca: z.string().max(15).optional(),
 	obs: z.string().max(20).optional(),
 
-	estoqueatual: z.coerce.number()
-		.max(999999.999, "Máximo permitido é 999999.999")
-		.refine(val => Number.isFinite(val) && Number((val * 1000) % 1) === 0, {
-			message: "Até 3 casas decimais permitidas",
-		})
-		.optional(),
+	estoqueatual: z.number().optional(),
 	estoqueminimo: z.coerce.number().optional(),    // numeric(9,3)
 	custoreal: z.coerce.number().optional(),        // numeric(12,2)
 	custorealporc: z.coerce.number().optional(),    // CUSTOREAL1
@@ -114,7 +110,7 @@ export const dadosGeraisFormSchema = z.object({
 	bitolaoriginal3: z.coerce.number().optional(),   // BITORIGI3 
 	barras: z.coerce.number().optional(),           // numeric(3,0)
 	comprimento: z.coerce.number().optional(),      // numeric(3,0)
-	local: z.string().max(2).optional(),
+	local: z.string().max(20).optional(),
 
 	nfcompra: z.string().max(8).optional(),         // NRODOCTO
 	datacompra: z
@@ -292,6 +288,7 @@ export function FormularioProduto() {
 	const [searchClassifisc, setSearchClassifisc] = useState("");
 	const [searchAtributo, setSearchAtributo] = useState("");
 	const [searchCsosn, setSearchCsosn] = useState("");
+	const [searchLocal, setSearchLocal] = useState("");
 
 	const {
 		data: classifiscData,
@@ -317,6 +314,22 @@ export function FormularioProduto() {
 		queryKey: ["listar-tributo", searchAtributo],
 		queryFn: () => listarAtributo(searchAtributo ?? ""),
 		enabled: searchAtributo === "" || searchAtributo.length > 3,
+		staleTime: 1000 * 60 * 5,
+		retry: (retries, error) => {
+			if (!(error instanceof AxiosError)) return false;
+			if (error.status && error.status >= 400 && error.status <= 499) return false;
+			return retries <= 2;
+		},
+	});
+
+	const {
+		data: localData,
+		isFetching: carregandoLocal,
+		failureReason: falhaAoBuscarLocal,
+	} = useQuery({
+		queryKey: ["listar-local", searchLocal],
+		queryFn: () => listarLocais(searchLocal ?? ""),
+		enabled: searchLocal === "" || searchLocal.length > 3,
 		staleTime: 1000 * 60 * 5,
 		retry: (retries, error) => {
 			if (!(error instanceof AxiosError)) return false;
@@ -552,9 +565,12 @@ export function FormularioProduto() {
 				handlePageChangeCorrida={handlePageChangeCorrida}
 				corridaSelecionada={corridaSelecionada}
 				setCorridaSelecionada={setCorridaSelecionada}
-			//validarCorrida={validarCorrida}
-			/>
 
+				localData={localData}
+				carregandoLocal={carregandoLocal}
+				setSearchLocal={setSearchLocal}
+				searchLocal={searchLocal}
+			/>
 		</div>
 	);
 

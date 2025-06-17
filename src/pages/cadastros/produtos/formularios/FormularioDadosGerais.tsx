@@ -16,9 +16,6 @@ import { NumericFormat } from 'react-number-format';
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { DataTable } from "@/components/DataTable";
 
-
-
-
 const tipoAcoOptions = [
 	"CM-CONSTRUCAO MECANICA",
 	"AF-ACO FERRAMENTA",
@@ -43,13 +40,11 @@ const unidadeEstqOptions = [
 	"Falta os outros options"
 ];
 
-const localOptions = [
-	"CH",
-	"Falta os outros options"
-];
+const localOptions = [""];
 
 import { ColumnDef } from "@tanstack/react-table";
 import { Search } from "lucide-react";
+import { buscarLocais } from "@/api/produto/lista-local";
 
 
 
@@ -95,6 +90,11 @@ interface FormularioDadosGeraisProps {
 	handlePageChangeCorrida: (page: number) => void;
 	corridaSelecionada: string;
 	setCorridaSelecionada: (valor: string) => void;
+
+	localData?: ListarResponse;
+	carregandoLocal: boolean;
+	setSearchLocal: React.Dispatch<React.SetStateAction<string>>;
+	searchLocal: string;
 }
 
 export function useDebounce<T>(value: T, delay: number): T {
@@ -137,7 +137,12 @@ export function FormularioDadosGerais({ dadosGeraisForm,
 	setModalAberto,
 	handlePageChangeCorrida,
 	corridaSelecionada,
-	setCorridaSelecionada
+	setCorridaSelecionada,
+
+	localData,
+	carregandoLocal,
+	setSearchLocal,
+	searchLocal
 }: FormularioDadosGeraisProps) {
 
 	const { control, formState: { errors }, clearErrors } = dadosGeraisForm;
@@ -305,19 +310,47 @@ export function FormularioDadosGerais({ dadosGeraisForm,
 								</Select>
 							</FormItem>
 						)} />
-						<FormField name="local" control={control} render={({ field }) => (
-							<FormItem className="w-20">
-								<FormLabel>Local</FormLabel>
-								<Select onValueChange={field.onChange} value={field.value}>
-									<SelectTrigger><SelectValue /></SelectTrigger>
-									<SelectContent>
-										{localOptions.map((option) => (
-											<SelectItem key={option} value={option.split("-")[0]}>{option}</SelectItem>
-										))}
-									</SelectContent>
-								</Select>
-							</FormItem>
-						)} />
+
+						<FormField
+							control={dadosGeraisForm.control}
+							name="local"
+							render={({ field: { onChange, value } }) => (
+								<FormItem className="col-span-2">
+									<FormLabel>Local</FormLabel>
+									<Select
+										onValueChange={(val) => {
+											clearErrors("local");
+											onChange(val);
+										}}
+										value={value}
+									>
+										<SelectTrigger>
+											<SelectValue />
+										</SelectTrigger>
+										<SelectContent>
+											<div className="p-2">
+												<input
+													className="w-full border p-2 text-sm"
+													value={searchLocal}
+													onChange={(e) => setSearchLocal(e.target.value)}
+												/>
+											</div>
+											{[...new Map(localData?.map(item => [item.value, item])).values()].map(local => (
+												<SelectItem key={local.value} value={local.value}>
+													{local.label}
+												</SelectItem>
+											))}
+										</SelectContent>
+									</Select>
+									{errors.local && (
+										<FormDescription className="text-destructive">
+											{errors.local.message}
+										</FormDescription>
+									)}
+								</FormItem>
+							)}
+						/>
+
 						<FormField name="barras" control={control} render={({ field }) => (
 							<FormItem>
 								<FormLabel>Barras</FormLabel>
@@ -336,34 +369,12 @@ export function FormularioDadosGerais({ dadosGeraisForm,
 								<Input {...field} />
 							</FormItem>
 						)} />
-						<FormField
-							name="estoqueatual"
-							control={control}
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Estq Atual</FormLabel>
-									<NumericFormat
-										decimalScale={3}
-										allowNegative={false}
-										thousandSeparator="."
-										decimalSeparator=","
-										customInput={Input}
-										value={field.value}
-										onValueChange={(values) => {
-											field.onChange(values.floatValue);
-										}}
-										isAllowed={({ floatValue }) => {
-											if (floatValue === undefined) return true;
-
-											// Limita a parte inteira a no máximo 9 dígitos
-											const [inteiros = "", decimais = ""] = floatValue.toString().split(".");
-											return inteiros.length <= 9 && decimais.length <= 3;
-										}}
-									/>
-
-								</FormItem>
-							)}
-						/>
+						<FormField name="estoqueatual" control={control} render={({ field }) => (
+							<FormItem>
+								<FormLabel>Estq Atual</FormLabel>
+								<Input {...field} />
+							</FormItem>
+						)} />
 					</div>
 					<TitleSeparator title="Descrição e Observação" />
 					<div className="grid grid-cols-4 gap-4">

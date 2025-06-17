@@ -164,7 +164,7 @@ export function Fornecedores() {
                     Home
                   </Link>{" "} / cadastro / Fornecedor
                 </span>
-                <CardTitle>Lista de Fornecedor</CardTitle>
+                <CardTitle>Lista de Fornecedores</CardTitle>
               </div>
               <div className="flex w-72 items-center space-x-2">
                 <FormField
