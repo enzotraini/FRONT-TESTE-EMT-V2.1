@@ -35,18 +35,13 @@ const tipoSecaoOptions = [
 	"TQ", "H ", "CT", "CQ", "CF", "CX", "CG", "RT", "CZ", "BL"
 ];
 
-const unidadeEstqOptions = [
-	"CH",
-	"Falta os outros options"
-];
+const unidadeEstqOptions = ["CEN", "CH", "CX", "ML", "MT", "PC", "KG", "TO", "M2", "M3", "VB", "UN", "CM"];
 
 const localOptions = [""];
 
 import { ColumnDef } from "@tanstack/react-table";
 import { Search } from "lucide-react";
-import { buscarLocais } from "@/api/produto/lista-local";
-
-
+//import { buscarLocais } from "@/api/produto/lista-local";
 
 const unidadeBlocoKOptions = [
 	"CH",
@@ -213,6 +208,58 @@ export function FormularioDadosGerais({ dadosGeraisForm,
 		},
 	];
 
+	//teste de penetração
+	const dadosTeste = {
+		codprod: "PROD123456789012345",       // max 20 chars
+		lote: "A",                           // max 1 char
+		tipo: "TipoProdutoX",                // max 20 chars
+		secao: "01",                        // max 2 chars
+		bitola1: 12.345,                    // número
+		bitola2: 10.001,                    // número
+		bitola3: 5.678,                     // número
+		acab: "ABC",                       // max 3 chars
+		unidade: "",                     // max 3 chars
+		local: "A",                        // max 1 char
+		barras: 123,                      // número, até 3 dígitos
+		comprimento: 100,                 // número
+		titulo: "Título do Produto",      // max 35 chars
+		marca: "MarcaX",                  // max 15 chars
+		corrida: "CorridaExemplo",        // max 15 chars
+		tipoaco: "TA",                   // max 2 chars
+		unidadeblocok: "UB",             // max 2 chars
+		tratamento: "TRT",               // max 3 chars
+		classifisc: "CLASF1234567890",  // max 15 chars
+		tributo: "TRIB",                 // max 4 chars
+		csosn: "CSOS",                  // max 4 chars
+		codprodutoblocok: "CPBLOCK1234567890", // max 20 chars
+		observacao: "Observação teste",  // max 40 chars
+		estoqueminimo: 10.000,            // número
+		estoqueatual: 100.123,            // número
+		custoreal: 1500.55,               // número
+		custorealporc: 10.50,             // número percentual
+		precovenda: 1800.99,              // número
+		obs: "Observação breve",          // max 20 chars
+		entrablocok: true,                // booleano
+		identificacao: "I",               // max 1 char
+		proqrama: "PROG12345",            // max 10 chars
+		bitolaoriginal1: 12.345,          // número
+		bitolaoriginal2: 10.000,          // número
+		bitolaoriginal3: 5.678,           // número
+		nfcompra: "12345678",             // max 8 chars
+		datacompra: "15/06/2025",         // string data válida DD/MM/YYYY
+		custocompra: 1400.50,             // número
+		fornecedor: "Fornecedor Exemplo", // max 40 chars
+		certificado: "CERT12345",          // max 10 chars
+		fci: "78901234567890123456", // max 36 chars
+		datacad: "10/06/2025",             // string data válida DD/MM/YYYY
+		observacoesgerais: "Observações gerais do produto para teste" // string opcional livre
+	};
+
+	// você pode popular assim ao montar o componente (exemplo):
+	useEffect(() => {
+		dadosGeraisForm.reset(dadosTeste);
+	}, [dadosGeraisForm]);
+
 	return (
 
 		<>
@@ -237,6 +284,11 @@ export function FormularioDadosGerais({ dadosGeraisForm,
 							<FormItem className="col-span-1 place-self-start">
 								<FormLabel>Lote</FormLabel>
 								<Input {...field} />
+								{errors.lote && (
+									<FormDescription className="text-destructive">
+										{errors.lote.message}
+									</FormDescription>
+								)}
 							</FormItem>
 						)} />
 
@@ -244,6 +296,11 @@ export function FormularioDadosGerais({ dadosGeraisForm,
 							<FormItem>
 								<FormLabel>Tipo de Material</FormLabel>
 								<Input {...field} />
+								{errors.tipo && (
+									<FormDescription className="text-destructive">
+										{errors.tipo.message}
+									</FormDescription>
+								)}
 							</FormItem>
 						)} />
 
@@ -258,6 +315,11 @@ export function FormularioDadosGerais({ dadosGeraisForm,
 										))}
 									</SelectContent>
 								</Select>
+								{errors.secao && (
+									<FormDescription className="text-destructive">
+										{errors.secao.message}
+									</FormDescription>
+								)}
 							</FormItem>
 						)} />
 
@@ -266,24 +328,75 @@ export function FormularioDadosGerais({ dadosGeraisForm,
 							<div className="flex gap-2">
 								<FormField name="bitola1" control={control} render={({ field }) => (
 									<FormItem>
-										<FormLabel>1</FormLabel>
-										<Input className="w-20" {...field} />
+										<FormLabel>Bitola 1</FormLabel>
+										<Input
+											{...field}
+											type="number"
+											step={0.001}
+											min={0}
+											max={99999.999}
+											onChange={e => {
+												const value = e.target.value;
+												if (
+													value === "" ||
+													(/^\d{0,5}(\.\d{0,3})?$/.test(value) && Number(value) <= 99999.999)
+												) {
+													field.onChange(value === "" ? undefined : Number(value));
+												}
+											}}
+										/>
+										{errors.bitola1 && <FormDescription className="text-destructive">{errors.bitola1.message}</FormDescription>}
 									</FormItem>
 								)} />
+
 								x
 								<FormField name="bitola2" control={control} render={({ field }) => (
 									<FormItem>
-										<FormLabel>2</FormLabel>
-										<Input className="w-20" {...field} />
+										<FormLabel>Bitola 2</FormLabel>
+										<Input
+											{...field}
+											type="number"
+											step={0.001}
+											min={0}
+											max={99999.999}
+											onChange={e => {
+												const value = e.target.value;
+												if (
+													value === "" ||
+													(/^\d{0,5}(\.\d{0,3})?$/.test(value) && Number(value) <= 99999.999)
+												) {
+													field.onChange(value === "" ? undefined : Number(value));
+												}
+											}}
+										/>
+										{errors.bitola2 && <FormDescription className="text-destructive">{errors.bitola2.message}</FormDescription>}
 									</FormItem>
 								)} />
+
 								x
 								<FormField name="bitola3" control={control} render={({ field }) => (
 									<FormItem>
-										<FormLabel>3</FormLabel>
-										<Input className="w-20" {...field} />
+										<FormLabel>Bitola 3</FormLabel>
+										<Input
+											{...field}
+											type="number"
+											step={0.001}
+											min={0}
+											max={99999.999}
+											onChange={e => {
+												const value = e.target.value;
+												if (
+													value === "" ||
+													(/^\d{0,5}(\.\d{0,3})?$/.test(value) && Number(value) <= 99999.999)
+												) {
+													field.onChange(value === "" ? undefined : Number(value));
+												}
+											}}
+										/>
+										{errors.bitola3 && <FormDescription className="text-destructive">{errors.bitola3.message}</FormDescription>}
 									</FormItem>
 								)} />
+
 							</div>
 						</fieldset>
 
@@ -295,6 +408,11 @@ export function FormularioDadosGerais({ dadosGeraisForm,
 							<FormItem>
 								<FormLabel>Acabamento</FormLabel>
 								<Input {...field} />
+								{errors.acab && (
+									<FormDescription className="text-destructive">
+										{errors.acab.message}
+									</FormDescription>
+								)}
 							</FormItem>
 						)} />
 						<FormField name="unidade" control={control} render={({ field }) => (
@@ -303,11 +421,18 @@ export function FormularioDadosGerais({ dadosGeraisForm,
 								<Select onValueChange={field.onChange} value={field.value}>
 									<SelectTrigger><SelectValue /></SelectTrigger>
 									<SelectContent>
+										<SelectItem key="Selecionar" value="">Selecionar</SelectItem>
+
 										{unidadeEstqOptions.map((option) => (
-											<SelectItem key={option} value={option.split("-")[0]}>{option}</SelectItem>
+											<SelectItem key={option} value={option}>{option}</SelectItem>
 										))}
 									</SelectContent>
 								</Select>
+								{errors.unidade && (
+									<FormDescription className="text-destructive">
+										{errors.unidade.message}
+									</FormDescription>
+								)}
 							</FormItem>
 						)} />
 
@@ -354,27 +479,96 @@ export function FormularioDadosGerais({ dadosGeraisForm,
 						<FormField name="barras" control={control} render={({ field }) => (
 							<FormItem>
 								<FormLabel>Barras</FormLabel>
-								<Input {...field} />
+								<Input
+									{...field}
+									type="number"
+									step={1}
+									min={0}
+									max={999}
+									onChange={e => {
+										const value = e.target.value;
+										if (
+											value === "" ||
+											(/^\d{0,3}$/.test(value) && Number(value) <= 999)
+										) {
+											field.onChange(value === "" ? undefined : Number(value));
+										}
+									}}
+								/>
+								{errors.barras && <FormDescription className="text-destructive">{errors.barras.message}</FormDescription>}
 							</FormItem>
 						)} />
+
 						<FormField name="comprimento" control={control} render={({ field }) => (
 							<FormItem>
 								<FormLabel>Comprimento</FormLabel>
-								<Input {...field} />
+								<Input
+									{...field}
+									type="number"
+									step={1}
+									min={0}
+									max={999}
+									onChange={e => {
+										const value = e.target.value;
+										if (
+											value === "" ||
+											(/^\d{0,3}$/.test(value) && Number(value) <= 999)
+										) {
+											field.onChange(value === "" ? undefined : Number(value));
+										}
+									}}
+								/>
+								{errors.comprimento && <FormDescription className="text-destructive">{errors.comprimento.message}</FormDescription>}
 							</FormItem>
 						)} />
+
 						<FormField name="estoqueminimo" control={control} render={({ field }) => (
 							<FormItem>
-								<FormLabel>Estq Minimo</FormLabel>
-								<Input {...field} />
+								<FormLabel>Estoque Mínimo</FormLabel>
+								<Input
+									{...field}
+									type="number"
+									step={0.001}
+									min={0}
+									max={999999.999}
+									onChange={e => {
+										const value = e.target.value;
+										if (
+											value === "" ||
+											(/^\d{0,6}(\.\d{0,3})?$/.test(value) && Number(value) <= 999999.999)
+										) {
+											field.onChange(value === "" ? undefined : Number(value));
+										}
+									}}
+								/>
+								{errors.estoqueminimo && <FormDescription className="text-destructive">{errors.estoqueminimo.message}</FormDescription>}
 							</FormItem>
 						)} />
 						<FormField name="estoqueatual" control={control} render={({ field }) => (
 							<FormItem>
-								<FormLabel>Estq Atual</FormLabel>
-								<Input {...field} />
+								<FormLabel>Estoque Atual</FormLabel>
+								<Input
+									{...field}
+									type="number"
+									step={0.001}
+									min={0}
+									max={999999.999}
+									onChange={e => {
+										const value = e.target.value;
+										// Regex para números com até 6 dígitos antes da vírgula e até 3 decimais
+										if (
+											value === "" ||
+											/^(\d{1,6})(\.\d{0,3})?$/.test(value) &&
+											Number(value) <= 999999.999
+										) {
+											field.onChange(value === "" ? undefined : Number(value));
+										}
+									}}
+								/>
+								{errors.estoqueatual && <FormDescription className="text-destructive">{errors.estoqueatual.message}</FormDescription>}
 							</FormItem>
 						)} />
+
 					</div>
 					<TitleSeparator title="Descrição e Observação" />
 					<div className="grid grid-cols-4 gap-4">
@@ -382,18 +576,33 @@ export function FormularioDadosGerais({ dadosGeraisForm,
 							<FormItem>
 								<FormLabel>Titulo</FormLabel>
 								<Input {...field} />
+								{errors.titulo && (
+									<FormDescription className="text-destructive">
+										{errors.titulo.message}
+									</FormDescription>
+								)}
 							</FormItem>
 						)} />
 						<FormField name="obs" control={control} render={({ field }) => (
 							<FormItem>
 								<FormLabel>Observacao</FormLabel>
 								<Input {...field} />
+								{errors.obs && (
+									<FormDescription className="text-destructive">
+										{errors.obs.message}
+									</FormDescription>
+								)}
 							</FormItem>
 						)} />
 						<FormField name="marca" control={control} render={({ field }) => (
 							<FormItem>
 								<FormLabel>Marca</FormLabel>
 								<Input {...field} />
+								{errors.marca && (
+									<FormDescription className="text-destructive">
+										{errors.marca.message}
+									</FormDescription>
+								)}
 							</FormItem>
 						)} />
 					</div>
@@ -525,21 +734,70 @@ export function FormularioDadosGerais({ dadosGeraisForm,
 						<FormField name="custoreal" control={control} render={({ field }) => (
 							<FormItem>
 								<FormLabel>Custo Real</FormLabel>
-								<Input {...field} />
+								<Input
+									{...field}
+									type="number"
+									step={0.01}
+									min={0}
+									max={9999999999.99}
+									onChange={e => {
+										const value = e.target.value;
+										if (
+											value === "" ||
+											(/^\d{0,10}(\.\d{0,2})?$/.test(value) && Number(value) <= 9999999999.99)
+										) {
+											field.onChange(value === "" ? undefined : Number(value));
+										}
+									}}
+								/>
+								{errors.custoreal && <FormDescription className="text-destructive">{errors.custoreal.message}</FormDescription>}
 							</FormItem>
 						)} />
 						<FormField name="custorealporc" control={control} render={({ field }) => (
 							<FormItem>
-								<FormLabel>Custo Real 12%</FormLabel>
-								<Input {...field} />
+								<FormLabel>Custo Real %</FormLabel>
+								<Input
+									{...field}
+									type="number"
+									step={0.01}
+									min={0}
+									max={9999999999.99}
+									onChange={e => {
+										const value = e.target.value;
+										if (
+											value === "" ||
+											(/^\d{0,10}(\.\d{0,2})?$/.test(value) && Number(value) <= 9999999999.99)
+										) {
+											field.onChange(value === "" ? undefined : Number(value));
+										}
+									}}
+								/>
+								{errors.custorealporc && <FormDescription className="text-destructive">{errors.custorealporc.message}</FormDescription>}
 							</FormItem>
 						)} />
 						<FormField name="precovenda" control={control} render={({ field }) => (
 							<FormItem>
-								<FormLabel>Preço de Venda</FormLabel>
-								<Input {...field} />
+								<FormLabel>Preço Venda</FormLabel>
+								<Input
+									{...field}
+									type="number"
+									step={0.01}
+									min={0}
+									max={9999999999.99}
+									onChange={e => {
+										const value = e.target.value;
+										if (
+											value === "" ||
+											(/^\d{0,10}(\.\d{0,2})?$/.test(value) && Number(value) <= 9999999999.99)
+										) {
+											field.onChange(value === "" ? undefined : Number(value));
+										}
+									}}
+								/>
+								{errors.precovenda && <FormDescription className="text-destructive">{errors.precovenda.message}</FormDescription>}
 							</FormItem>
 						)} />
+
 					</div>
 					<TitleSeparator title="Preço e Custo" />
 					<div className="grid grid-cols-4 gap-4">
@@ -570,6 +828,11 @@ export function FormularioDadosGerais({ dadosGeraisForm,
 										))}
 									</SelectContent>
 								</Select>
+								{errors.unidadeblocok && (
+									<FormDescription className="text-destructive">
+										{errors.unidadeblocok.message}
+									</FormDescription>
+								)}
 							</FormItem>
 						)} />
 
@@ -649,6 +912,11 @@ export function FormularioDadosGerais({ dadosGeraisForm,
 										))}
 									</SelectContent>
 								</Select>
+								{errors.tipoaco && (
+									<FormDescription className="text-destructive">
+										{errors.tipoaco.message}
+									</FormDescription>
+								)}
 							</FormItem>
 						)} />
 
@@ -656,6 +924,11 @@ export function FormularioDadosGerais({ dadosGeraisForm,
 							<FormItem>
 								<FormLabel>Identificação</FormLabel>
 								<Input {...field} />
+								{errors.identificacao && (
+									<FormDescription className="text-destructive">
+										{errors.identificacao.message}
+									</FormDescription>
+								)}
 							</FormItem>
 						)} />
 
@@ -670,6 +943,11 @@ export function FormularioDadosGerais({ dadosGeraisForm,
 										rows={4}
 										{...field}
 									/>
+									{errors.observacao && (
+										<FormDescription className="text-destructive">
+											{errors.observacao.message}
+										</FormDescription>
+									)}
 								</FormItem>
 							)}
 						/>
@@ -681,6 +959,11 @@ export function FormularioDadosGerais({ dadosGeraisForm,
 							<FormItem>
 								<FormLabel>Programa</FormLabel>
 								<Input {...field} />
+								{errors.proqrama && (
+									<FormDescription className="text-destructive">
+										{errors.proqrama.message}
+									</FormDescription>
+								)}
 							</FormItem>
 						)} />
 
@@ -695,6 +978,11 @@ export function FormularioDadosGerais({ dadosGeraisForm,
 										))}
 									</SelectContent>
 								</Select>
+								{errors.tratamento && (
+									<FormDescription className="text-destructive">
+										{errors.tratamento.message}
+									</FormDescription>
+								)}
 							</FormItem>
 						)} />
 
@@ -705,27 +993,75 @@ export function FormularioDadosGerais({ dadosGeraisForm,
 								<FormField name="bitolaoriginal1" control={control} render={({ field }) => (
 									<FormItem>
 										<FormLabel>1</FormLabel>
-										<Input className="w-32" {...field} />
+										<Input
+											{...field}
+											type="number"
+											step={0.001}
+											min={0}
+											max={99999.999}
+											onChange={e => {
+												const value = e.target.value;
+												if (
+													value === "" ||
+													(/^\d{0,5}(\.\d{0,3})?$/.test(value) && Number(value) <= 99999.999)
+												) {
+													field.onChange(value === "" ? undefined : Number(value));
+												}
+											}}
+										/>
+										{errors.bitolaoriginal1 && <FormDescription className="text-destructive">{errors.bitolaoriginal1.message}</FormDescription>}
 									</FormItem>
 								)} />
+
 								x
 								<FormField name="bitolaoriginal2" control={control} render={({ field }) => (
 									<FormItem>
 										<FormLabel>2</FormLabel>
-										<Input className="w-32" {...field} />
+										<Input
+											{...field}
+											type="number"
+											step={0.001}
+											min={0}
+											max={99999.999}
+											onChange={e => {
+												const value = e.target.value;
+												if (
+													value === "" ||
+													(/^\d{0,5}(\.\d{0,3})?$/.test(value) && Number(value) <= 99999.999)
+												) {
+													field.onChange(value === "" ? undefined : Number(value));
+												}
+											}}
+										/>
+										{errors.bitolaoriginal2 && <FormDescription className="text-destructive">{errors.bitolaoriginal2.message}</FormDescription>}
 									</FormItem>
 								)} />
+
 								x
 								<FormField name="bitolaoriginal3" control={control} render={({ field }) => (
 									<FormItem>
 										<FormLabel>3</FormLabel>
-										<Input className="w-32" {...field} />
+										<Input
+											{...field}
+											type="number"
+											step={0.001}
+											min={0}
+											max={99999.999}
+											onChange={e => {
+												const value = e.target.value;
+												if (
+													value === "" ||
+													(/^\d{0,5}(\.\d{0,3})?$/.test(value) && Number(value) <= 99999.999)
+												) {
+													field.onChange(value === "" ? undefined : Number(value));
+												}
+											}}
+										/>
+										{errors.bitolaoriginal3 && <FormDescription className="text-destructive">{errors.bitolaoriginal3.message}</FormDescription>}
 									</FormItem>
 								)} />
 							</div>
 						</fieldset>
-
-
 					</div>
 					<TitleSeparator title="Dados do Fornecedor de Compras" />
 					<div className="grid grid-cols-3 gap-4">
@@ -740,22 +1076,33 @@ export function FormularioDadosGerais({ dadosGeraisForm,
 							name="datacompra"
 							control={control}
 							render={({ field }) => (
-								<FormItem>
+								<FormItem className="w-48">
 									<FormLabel>Data da Compra</FormLabel>
-									<InputMask
-										mask="99/99/9999"
-										value={field.value}
-										onChange={field.onChange}
-										onBlur={field.onBlur}
-									>
-										{(inputProps) => (
-											<Input
-												{...inputProps}
-												ref={field.ref}
-											/>
-										)}
-									</InputMask>
-
+									<Input
+										type="date"
+										{...field}
+										// Ajusta para evitar conflito com formato diferente
+										onChange={(e) => {
+											// Converte 'yyyy-mm-dd' para 'dd/mm/yyyy'
+											const val = e.target.value;
+											if (!val) {
+												field.onChange('');
+												return;
+											}
+											const [year, month, day] = val.split('-');
+											field.onChange(`${day}/${month}/${year}`);
+										}}
+										value={
+											// Converte de DD/MM/YYYY para yyyy-mm-dd para exibir no input
+											(() => {
+												const v = field.value;
+												if (!v) return '';
+												const parts = v.split('/');
+												if (parts.length !== 3) return '';
+												return `${parts[2]}-${parts[1]}-${parts[0]}`;
+											})()
+										}
+									/>
 									{errors.datacompra && (
 										<FormDescription className="text-destructive">
 											{errors.datacompra.message}
@@ -768,7 +1115,23 @@ export function FormularioDadosGerais({ dadosGeraisForm,
 						<FormField name="custocompra" control={control} render={({ field }) => (
 							<FormItem>
 								<FormLabel>Custo Compra</FormLabel>
-								<Input {...field} />
+								<Input
+									{...field}
+									type="number"
+									step={0.01}
+									min={0}
+									max={9999999999.99}
+									onChange={e => {
+										const value = e.target.value;
+										if (
+											value === "" ||
+											(/^\d{0,10}(\.\d{0,2})?$/.test(value) && Number(value) <= 9999999999.99)
+										) {
+											field.onChange(value === "" ? undefined : Number(value));
+										}
+									}}
+								/>
+								{errors.custocompra && <FormDescription className="text-destructive">{errors.custocompra.message}</FormDescription>}
 							</FormItem>
 						)} />
 
@@ -776,6 +1139,11 @@ export function FormularioDadosGerais({ dadosGeraisForm,
 							<FormItem>
 								<FormLabel>Fornecedor</FormLabel>
 								<Input {...field} />
+								{errors.fornecedor && (
+									<FormDescription className="text-destructive">
+										{errors.fornecedor.message}
+									</FormDescription>
+								)}
 							</FormItem>
 						)} />
 
@@ -783,6 +1151,11 @@ export function FormularioDadosGerais({ dadosGeraisForm,
 							<FormItem>
 								<FormLabel>Nro. Certificado</FormLabel>
 								<Input {...field} />
+								{errors.certificado && (
+									<FormDescription className="text-destructive">
+										{errors.certificado.message}
+									</FormDescription>
+								)}
 							</FormItem>
 						)} />
 					</div>
@@ -793,27 +1166,62 @@ export function FormularioDadosGerais({ dadosGeraisForm,
 							<FormItem>
 								<FormLabel>FCI</FormLabel>
 								<Input {...field} />
+								{errors.fci && (
+									<FormDescription className="text-destructive">
+										{errors.fci.message}
+									</FormDescription>
+								)}
 							</FormItem>
 						)} />
 						<FormField
 							name="datacad"
 							control={control}
 							render={({ field }) => (
-								<FormItem className="col-span-2">
+								<FormItem className="w-48">
 									<FormLabel>Data de Cadastro</FormLabel>
-									<InputMask
-										mask="99/99/9999"
+									<Input
+										type="date"
 										{...field}
-									>
-										{(inputProps) => <Input {...inputProps} />}
-									</InputMask>
+										// Ajusta para evitar conflito com formato diferente
+										onChange={(e) => {
+											// Converte 'yyyy-mm-dd' para 'dd/mm/yyyy'
+											const val = e.target.value;
+											if (!val) {
+												field.onChange('');
+												return;
+											}
+											const [year, month, day] = val.split('-');
+											field.onChange(`${day}/${month}/${year}`);
+										}}
+										value={
+											// Converte de DD/MM/YYYY para yyyy-mm-dd para exibir no input
+											(() => {
+												const v = field.value;
+												if (!v) return '';
+												const parts = v.split('/');
+												if (parts.length !== 3) return '';
+												return `${parts[2]}-${parts[1]}-${parts[0]}`;
+											})()
+										}
+									/>
+									{errors.datacad && (
+										<FormDescription className="text-destructive">
+											{errors.datacad.message}
+										</FormDescription>
+									)}
 								</FormItem>
 							)}
 						/>
+
 						<FormField name="observacoesgerais" control={control} render={({ field }) => (
 							<FormItem className="col-span-2 mt-4">
 								<FormLabel>Observações Gerais</FormLabel>
 								<Textarea rows={4} {...field} />
+								{errors.observacoesgerais && (
+									<FormDescription className="text-destructive">
+										{errors.observacoesgerais.message}
+									</FormDescription>
+								)}
 							</FormItem>
 						)} />
 					</div>

@@ -148,8 +148,8 @@ export function Fornecedores() {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Fornecedor</h1>
         <Link to="/cadastros/fornecedores/novo">
-          <Button>
-            <Plus className="mr-2 h-4 w-4" />
+          <Button className="px-2 py-1 text-sm h-8 mr-2">
+            <Plus className="mr-2 h-3 w-3" />
             Novo Fornecedor
           </Button>
         </Link>

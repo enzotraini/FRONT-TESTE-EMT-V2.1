@@ -21,6 +21,12 @@ import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom"
 import { z } from "zod";
 import { listarClassifisc, listarCsosn, listarAtributo, ListarResponse, BuscarCorridasResponse, buscarCorridas } from "@/api/fiscal/listas-produto";
 import dayjs from "dayjs";
+import customParseFormat from "dayjs/plugin/customParseFormat";
+import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
+
+dayjs.extend(customParseFormat);
+dayjs.extend(isSameOrBefore);
+
 import { criarProdutoService } from "@/api/produto/criar-service";
 import { toast } from "sonner";
 import { editarProduto } from "@/api/produto/editar-produto";
@@ -57,41 +63,37 @@ function transformValue<T, K extends keyof T>(
 }
 
 export const dadosGeraisFormSchema = z.object({
-	codprod: z.string().min(1, { message: "Código é obrigatório" }).max(20),
-	lote: z.string().max(1).optional(),
-	identific: z.string().max(1).optional(),
-	tipo: z.string().max(20).optional(),
-	secao: z.string().max(2).optional(),
-	acab: z.string().max(3).optional(),
-	descricao: z.string().max(40).optional(),
-	unidade: z.string().max(3).optional(),
-	titulo: z.string().max(35).optional(),
-	marca: z.string().max(15).optional(),
-	obs: z.string().max(20).optional(),
+	codprod: z.string().min(1, { message: "Código é obrigatório" }).max(20, { message: "Máximo de 20 caracteres" }),
+	lote: z.string().max(1, { message: "Máximo de 1 caractere" }).optional(),
+	identific: z.string().max(1, { message: "Máximo de 1 caractere" }).optional(),
+	tipo: z.string().max(20, { message: "Máximo de 20 caracteres" }).optional(),
+	secao: z.string().max(2, { message: "Máximo de 2 caracteres" }).optional(),
+	acab: z.string().max(3, { message: "Máximo de 3 caracteres" }).optional(),
+	descricao: z.string().max(40, { message: "Máximo de 40 caracteres" }).optional(),
+	unidade: z.string().max(3, { message: "Máximo de 3 caracteres" }).optional(),
+	titulo: z.string().max(35, { message: "Máximo de 35 caracteres" }).optional(),
+	marca: z.string().max(15, { message: "Máximo de 15 caracteres" }).optional(),
+	obs: z.string().max(20, { message: "Máximo de 20 caracteres" }).optional(),
 
 	estoqueatual: z.number().optional(),
-	estoqueminimo: z.coerce.number().optional(),    // numeric(9,3)
-	custoreal: z.coerce.number().optional(),        // numeric(12,2)
-	custorealporc: z.coerce.number().optional(),    // CUSTOREAL1
-	precovenda: z.coerce.number().optional(),       // numeric(12,2)
+	estoqueminimo: z.coerce.number().optional(),
+	custoreal: z.coerce.number().optional(),
+	custorealporc: z.coerce.number().optional(),
+	precovenda: z.coerce.number().optional(),
 
-	classifisc: z.string().max(15).optional(),
-	tributo: z.string().max(4).optional(),
-	csosn: z.string().max(4).optional(),
+	classifisc: z.string().max(15, { message: "Máximo de 15 caracteres" }).optional(),
+	tributo: z.string().max(4, { message: "Máximo de 4 caracteres" }).optional(),
+	csosn: z.string().max(4, { message: "Máximo de 4 caracteres" }).optional(),
 
-	entrablocok: z.boolean().optional(),                       // bit
-	unidadeblocok: z.string().max(2).optional(),            // UNIDBLOCOK
-	codprodutoblocok: z.string().max(20).optional(),           // COD_ITEM_K
+	entrablocok: z.boolean().optional(),
+	unidadeblocok: z.string().max(2, { message: "Máximo de 2 caracteres" }).optional(),
+	codprodutoblocok: z.string().max(20, { message: "Máximo de 20 caracteres" }).optional(),
 
-	corrida: z
-		.string()
-		.max(15, { message: "Máximo de 15 caracteres" })
-		.optional()
-		.or(z.literal("")),
-	tipoaco: z.string().max(2).optional(),
-	tratamento: z.string().max(3).optional(),
+	corrida: z.string().max(15, { message: "Máximo de 15 caracteres" }).optional().or(z.literal("")),
+	tipoaco: z.string().max(2, { message: "Máximo de 2 caracteres" }).optional(),
+	tratamento: z.string().max(3, { message: "Máximo de 3 caracteres" }).optional(),
 
-	texto: z.string().max(16).optional(),
+	texto: z.string().max(16, { message: "Máximo de 16 caracteres" }).optional(),
 
 	bitola1: z.coerce.number().optional(),
 	bitola2: z.coerce.number().optional(),
@@ -103,70 +105,64 @@ export const dadosGeraisFormSchema = z.object({
 
 	compriment: z.coerce.number().optional(),
 
-	identificacao: z.string().max(1).optional(),    // IDENTIFIC
-	proqrama: z.string().max(10).optional(),        // PROGRAMA
-	bitolaoriginal1: z.coerce.number().optional(),   // BITORIGI1 
-	bitolaoriginal2: z.coerce.number().optional(),   // BITORIGI2 
-	bitolaoriginal3: z.coerce.number().optional(),   // BITORIGI3 
-	barras: z.coerce.number().optional(),           // numeric(3,0)
-	comprimento: z.coerce.number().optional(),      // numeric(3,0)
-	local: z.string().max(20).optional(),
+	identificacao: z.string().max(1, { message: "Máximo de 1 caractere" }).optional(),
+	proqrama: z.string().max(10, { message: "Máximo de 10 caracteres" }).optional(),
+	bitolaoriginal1: z.coerce.number().optional(),
+	bitolaoriginal2: z.coerce.number().optional(),
+	bitolaoriginal3: z.coerce.number().optional(),
+	barras: z.coerce.number()
+		.int({ message: "Deve ser um número inteiro" })
+		.min(0, { message: "Valor mínimo é 0" })
+		.max(999, { message: "Máximo de 3 dígitos" })
+		.optional(),
+	comprimento: z.coerce.number().optional(),
+	local: z.string().max(20, { message: "Máximo de 20 caracteres" }).optional(),
 
-	nfcompra: z.string().max(8).optional(),         // NRODOCTO
-	datacompra: z
-		.string()
-		.max(10)
+	nfcompra: z.string().max(8, { message: "Máximo de 8 caracteres" }).optional(),
+	datacompra: z.string()
+		.max(10, { message: "Máximo de 10 caracteres" })
 		.optional()
-		.refine((value) => {
+		.refine(value => {
 			if (!value) return true;
-			return dayjs(value, "DD/MM/YYYY", true).isValid();
+			const parsed = dayjs(value, "DD/MM/YYYY", true);
+			return parsed.isValid();
 		}, { message: "Data inválida" })
-		.refine((value) => {
+		.refine(value => {
 			if (!value) return true;
-			const date = dayjs(value, "DD/MM/YYYY", true);
-			return date.isAfter(dayjs("31/12/2018", "DD/MM/YYYY"));
+			const parsed = dayjs(value, "DD/MM/YYYY", true);
+			return parsed.isAfter("2018-12-31");
 		}, { message: "Data deve ser após 31/12/2018" })
-		.refine((value) => {
+		.refine(value => {
 			if (!value) return true;
-			const date = dayjs(value, "DD/MM/YYYY", true);
-			return date.isBefore(dayjs());
-		}, { message: "Data não pode ser futura" }).optional(),
-	custocompra: z.coerce.number().optional(),      // CUSULTCPA
-	fornecedor: z.string().max(40).optional(),      // FORNECEDOR
-	certificado: z.string().max(10).optional(),     // NROCERTI
-
-	fci: z.string().max(36).optional(),
-	datacad: z
-		.string()
-		.max(10)
+			const parsed = dayjs(value, "DD/MM/YYYY", true);
+			return parsed.isSameOrBefore(dayjs(), "day");
+		}, { message: "Data não pode ser futura" }),
+	custocompra: z.coerce.number().optional(),
+	fornecedor: z.string().max(40, { message: "Máximo de 40 caracteres" }).optional(),
+	certificado: z.string().max(10, { message: "Máximo de 10 caracteres" }).optional(),
+	fci: z.string().max(36, { message: "Máximo de 36 caracteres" }).optional(),
+	datacad: z.string()
+		.max(10, { message: "Máximo de 10 caracteres" })
 		.optional()
-		.refine(
-			(value) => {
-				if (!value) return true; // se for opcional
-				const date = dayjs(value, "DD/MM/YYYY", true);
-				return date.isValid();
-			},
-			{ message: "Data inválida" }
-		)
-		.refine(
-			(value) => {
-				if (!value) return true;
-				const date = dayjs(value, "DD/MM/YYYY", true);
-				return date.isAfter("2018-12-31");
-			},
-			{ message: "Data deve ser após 31/12/2018" }
-		)
-		.refine(
-			(value) => {
-				if (!value) return true;
-				const date = dayjs(value, "DD/MM/YYYY", true);
-				return date.isBefore(dayjs());
-			},
-			{ message: "Data não pode ser futura" }
-		).optional(),
-	observacao: z.string().max(40).optional(),      // TEXTO pode ser separado se for textarea
-	observacoesgerais: z.string().optional(),       // mapeável para TEXTO ou outro campo
+		.refine(value => {
+			if (!value) return true;
+			const parsed = dayjs(value, "DD/MM/YYYY", true);
+			return parsed.isValid();
+		}, { message: "Data inválida" })
+		.refine(value => {
+			if (!value) return true;
+			const parsed = dayjs(value, "DD/MM/YYYY", true);
+			return parsed.isAfter("2018-12-31");
+		}, { message: "Data deve ser após 31/12/2018" })
+		.refine(value => {
+			if (!value) return true;
+			const parsed = dayjs(value, "DD/MM/YYYY", true);
+			return parsed.isSameOrBefore(dayjs(), "day");
+		}, { message: "Data não pode ser futura" }),
+	observacao: z.string().max(40, { message: "Máximo de 40 caracteres" }).optional(),
+	observacoesgerais: z.string().optional(),
 });
+
 
 export type DadosGeraisForm = z.infer<typeof dadosGeraisFormSchema>;
 
@@ -269,6 +265,7 @@ export function FormularioProduto() {
 			console.log("Sucesso na criação do cliente:", data);
 			toast.success("Cliente criado com sucesso!");
 			queryClient.invalidateQueries({ queryKey: ["listar-produtos"] });
+			debugger
 			navigate("/cadastros/produtos");
 		},
 		onError: (error) => {
