@@ -14,11 +14,14 @@ import {
 	FormLabel,
 	FormMessage,
 } from "@/components/ui/form";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Logo } from "@/components/ui/logo";
 import { useMutation } from "@tanstack/react-query";
 import { authenticate } from "@/api/usuario/authenticate";
 import { useNavigate, Link } from "react-router-dom";
 import { toast, Toaster } from "sonner";
 import { AxiosError } from "axios";
+import { Loader2, Mail, Lock } from "lucide-react";
 
 const signInFormSchema = z.object({
 	email: z

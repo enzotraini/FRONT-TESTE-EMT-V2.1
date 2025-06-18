@@ -192,7 +192,7 @@ export function FormularioDeClientes() {
 			// Preparar dados no formato que o backend espera
 			const dadosBase = {
 				// Dados Gerais
-				codigo: dadosGerais.codigo || String(Date.now()),
+				codigo: dadosGerais.codigo || "",
 				nome: dadosGerais.nome,
 				tipo: dadosGerais.tipo, // Mantendo como string ('fisica' ou 'juridica')
 				identificador: dadosGerais.identificador.replace(/\D/g, ""),
@@ -260,9 +260,8 @@ export function FormularioDeClientes() {
 				percentualAumentoTeorico: Number(dadosAdicionais.percentualAumentoTeorico) || 0,
 				percentualPerda: Number(dadosAdicionais.percentualPerda) || 0,
 				contatosAdicionais: dadosAdicionais.contatosAdicionais || [],
-				observacoesGerais: dadosAdicionais.observacoesGerais || "",
-				user_id: 1, // Valor fixo para teste
-				organizacao_id: 1 // Valor fixo para teste
+				observacoesGerais: dadosAdicionais.observacoesGerais || ""
+				// user_id e organizacao_id são obtidos automaticamente do JWT no backend
 			};
 
 			console.log("Dados preparados para envio:", dadosBase);

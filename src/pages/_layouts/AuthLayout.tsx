@@ -1,4 +1,5 @@
 import { Outlet, useLocation } from "react-router-dom";
+import { Logo } from "@/components/ui/logo";
 
 export function AuthLayout() {
 	console.log("Renderizando AuthLayout - Início");
@@ -22,9 +23,13 @@ export function AuthLayout() {
 					</p>
 				</footer>
 			</div>
-			<div className="h-screen flex-1 flex justify-center items-center">
-				{console.log("AuthLayout - Renderizando Outlet para:", location.pathname)}
-				<div className="w-full max-w-md">
+			
+			{/* Lado direito com gradiente suave */}
+			<div className="h-screen flex-1 flex justify-center items-center bg-gradient-to-br from-white via-slate-50 to-slate-100 dark:from-slate-900 dark:via-slate-850 dark:to-slate-800 relative">
+				{/* Background pattern mais discreto */}
+				<div className="absolute inset-0 bg-grid-slate-100 dark:bg-grid-slate-900 opacity-10"></div>
+				
+				<div className="w-full max-w-md relative z-10 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-300">
 					<Outlet />
 				</div>
 			</div>

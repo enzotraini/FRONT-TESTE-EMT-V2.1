@@ -1,0 +1,1 @@
+export { ControleNotas } from './ControleNotas'; 
