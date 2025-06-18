@@ -20,6 +20,7 @@ export function Transportadoras() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const queryClient = useQueryClient();
+  const [transportadoraParaDeletar, setTransportadoraParaDeletar] = useState<number | null>(null);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["transportadoras", page, search],

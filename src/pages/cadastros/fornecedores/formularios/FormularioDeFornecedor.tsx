@@ -222,36 +222,41 @@ export function FormularioFornecedor() {
 		});
 
 		try {
+			// Limpar e validar o CPF/CNPJ
+			const identificadorLimpo = dadosGerais?.identificador.replace(/\D/g, "");
+			
+			if (identificadorLimpo.length !== 11 && identificadorLimpo.length !== 14) {
+				toast.error("CPF deve ter 11 dígitos ou CNPJ deve ter 14 dígitos");
+				return;
+			}
+
 			// Preparar dados no formato que o backend espera
 			const dadosBase = {
 				// Dados Gerais
-				empresa: "001",
-				cgcfor: dadosGerais?.identificador.replace(/\D/g, ""),
+				codigo: dadosGerais?.codigo || "",
 				nome: dadosGerais?.nome,
+				identificador: identificadorLimpo, // Campo correto para o backend
 				// Endereço
-				endereco: dadosGerais?.rua,
-				nro: Number(dadosGerais?.numero) || 0,
+				rua: dadosGerais?.rua,
+				numero: Number(dadosGerais?.numero) || 0,
+				complemento: dadosGerais?.complemento || "",
 				bairro: dadosGerais?.bairro,
 				cidade: dadosGerais?.cidade,
 				cep: dadosGerais?.cep.replace(/\D/g, ""),
-				complement: dadosGerais?.complemento || "",
 				estado: dadosGerais?.estado,
-				observacao: dadosGerais?.observacao,
-				fantasia: dadosGerais?.nomeFantasia,
-				// Dados fiscais
-				estadualrg: dadosGerais.estadualrg?.replace(/\D/g, ""),
-				tipoie: dadosGerais?.tipoie,
-				ctacontabi: dadosGerais?.contaContabil,
-				// Contato
-				contato: dadosGerais?.nomeContato || "",
+				// Dados opcionais
+				nomeFantasia: dadosGerais?.nomeFantasia || "",
+				observacao: dadosGerais?.observacao || "",
+				nomeContato: dadosGerais?.nomeContato || "",
 				telefone1: dadosGerais?.telefone1 || "",
 				telefone2: dadosGerais?.telefone2 || "",
-				segmento: dadosGerais?.segmento,
+				segmento: dadosGerais?.segmento || "",
 				site: dadosGerais?.site || "",
-				email: dadosGerais?.emailComercial || "",
-				emailfis: dadosGerais?.emailFiscal || "",
-				user_id: 1, // Valor fixo para teste
-				organizacao_id: 1 // Valor fixo para teste
+				estadualrg: dadosGerais?.estadualrg || "",
+				tipoie: dadosGerais?.tipoie,
+				contaContabil: dadosGerais?.contaContabil || "",
+				emailComercial: dadosGerais?.emailComercial || "",
+				emailFiscal: dadosGerais?.emailFiscal || "",
 			};
 
 			console.log("Dados preparados para envio:", dadosBase);
@@ -262,7 +267,7 @@ export function FormularioFornecedor() {
 					...dadosBase,
 				});
 				toast.success("Fornecedor editado com sucesso!");
-				queryClient.invalidateQueries({ queryKey: ["listar-clientes"] });
+				queryClient.invalidateQueries({ queryKey: ["listar-fornecedores"] });
 				navigate("/cadastros/fornecedores");
 			} else {
 				await criarFornecedorFn(dadosBase);
@@ -271,9 +276,9 @@ export function FormularioFornecedor() {
 			console.error("Erro ao salvar fornecedor:", error);
 			if (error instanceof AxiosError) {
 				console.error("Detalhes do erro:", error.response?.data);
-				toast.error(error.response?.data?.message || "Erro ao salvar cliente");
+				toast.error(error.response?.data?.message || "Erro ao salvar fornecedor");
 			} else {
-				toast.error("Erro ao salvar cliente");
+				toast.error("Erro ao salvar fornecedor");
 			}
 		}
 	};
