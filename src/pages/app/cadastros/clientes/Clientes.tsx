@@ -149,10 +149,24 @@ export function Clientes() {
 	const { data: buscarClientesResponse, isFetching: buscandoClientes } =
 		useQuery({
 			queryKey: ["clientes", page, perPage, search],
-			queryFn: () => buscarClientes({ page, perPage, search }),
+			queryFn: async () => {
+				try {
+					return await buscarClientes({ page, perPage, search });
+				} catch (error) {
+					console.warn("[Clientes] Erro ao buscar clientes, usando dados de fallback:", error);
+					// Retorna dados de fallback em caso de erro para evitar logout
+					return { 
+						clientes: [], 
+						meta: { page, perPage, total: 0 }, 
+						teste: {} 
+					};
+				}
+			},
 			initialData: { clientes: [], meta: { page, perPage, total: 0 }, teste: {} },
 			initialDataUpdatedAt: 0,
 			staleTime: 0,
+			retry: false, // Não retenta em caso de erro
+			refetchOnWindowFocus: false, // Não refaz a query quando a janela ganha foco
 		});
 
 	const { mutateAsync: deletarClienteFn } = useMutation({

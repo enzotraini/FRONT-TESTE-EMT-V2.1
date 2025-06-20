@@ -1,0 +1,1 @@
+export { KardexMateriaPrima } from "./KardexMateriaPrima"; 
