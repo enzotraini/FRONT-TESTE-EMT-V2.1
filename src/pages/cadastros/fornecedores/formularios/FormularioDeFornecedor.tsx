@@ -303,7 +303,7 @@ export function FormularioFornecedor() {
 				toast.error("CPF deve ter 11 dígitos ou CNPJ deve ter 14 dígitos");
 				return;
 			}
-
+			debugger
 			// Preparar dados no formato que o backend espera
 			const dadosBase = {
 				// Dados Gerais
@@ -312,7 +312,7 @@ export function FormularioFornecedor() {
 				cgcfor: identificadorLimpo, // Campo correto para o backend
 				// Endereço
 				endereco: dadosGerais?.endereco,
-				numero: Number(dadosGerais?.numero) || 0,
+				nro: Number(dadosGerais?.numero) || null,
 				complemento: dadosGerais?.complemento || "",
 				bairro: dadosGerais?.bairro,
 				cidade: dadosGerais?.cidade,
