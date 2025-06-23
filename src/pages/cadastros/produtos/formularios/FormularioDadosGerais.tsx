@@ -15,6 +15,8 @@ import { buscarCorridas, BuscarCorridasResponse, listarClassifisc, ListarRespons
 import { NumericFormat } from 'react-number-format';
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { DataTable } from "@/components/DataTable";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 const tipoAcoOptions = [
 	"CM-CONSTRUCAO MECANICA",
@@ -260,9 +262,9 @@ export function FormularioDadosGerais({ dadosGeraisForm,
 	};
 
 	// você pode popular assim ao montar o componente (exemplo):
-	useEffect(() => {
-		dadosGeraisForm.reset(dadosTeste);
-	}, [dadosGeraisForm]);
+	// useEffect(() => {
+	// 	dadosGeraisForm.reset(dadosTeste);
+	// }, [dadosGeraisForm]);
 
 	return (
 
@@ -1084,32 +1086,21 @@ export function FormularioDadosGerais({ dadosGeraisForm,
 									name="datacompra"
 									control={control}
 									render={({ field }) => (
-										<FormItem className="w-48">
+										<FormItem className="flex flex-col space-y-4">
 											<FormLabel>Data da Compra</FormLabel>
-											<Input
-												type="date"
-												{...field}
-												// Ajusta para evitar conflito com formato diferente
-												onChange={(e) => {
-													// Converte 'yyyy-mm-dd' para 'dd/mm/yyyy'
-													const val = e.target.value;
-													if (!val) {
+											<DatePicker
+												selected={field.value ? dayjs(field.value, 'DD/MM/YYYY').toDate() : null}
+												onChange={(date) => {
+													if (!date) {
 														field.onChange('');
 														return;
 													}
-													const [year, month, day] = val.split('-');
-													field.onChange(`${day}/${month}/${year}`);
+													const formatted = dayjs(date).format('DD/MM/YYYY');
+													field.onChange(formatted);
 												}}
-												value={
-													// Converte de DD/MM/YYYY para yyyy-mm-dd para exibir no input
-													(() => {
-														const v = field.value;
-														if (!v) return '';
-														const parts = v.split('/');
-														if (parts.length !== 3) return '';
-														return `${parts[2]}-${parts[1]}-${parts[0]}`;
-													})()
-												}
+												dateFormat="dd/MM/yyyy"
+												placeholderText=""
+												className="w-full border border-input bg-background text-sm rounded-md px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
 											/>
 											{errors.datacompra && (
 												<FormDescription className="text-destructive">
@@ -1181,7 +1172,7 @@ export function FormularioDadosGerais({ dadosGeraisForm,
 										)}
 									</FormItem>
 								)} />
-								<FormField
+								{/* <FormField
 									name="datacad"
 									control={control}
 									render={({ field }) => (
@@ -1219,7 +1210,7 @@ export function FormularioDadosGerais({ dadosGeraisForm,
 											)}
 										</FormItem>
 									)}
-								/>
+								/> */}
 
 								<FormField name="observacoesgerais" control={control} render={({ field }) => (
 									<FormItem className="col-span-2 mt-4">
