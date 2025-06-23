@@ -36,16 +36,7 @@ export interface CriarService {
 	//contribuinteICMS: "1";
 	//isuframa?: string;
 	nomeFantasia?: string;
-	tipoConsumo: "1";
-
-	// Praça de pagamento
-	pracaCep: string;
-	pracaRua: string;
-	pracaNumero?: number;
-	pracaComplemento?: string;
-	pracaBairro: string;
-	pracaCidade: string;
-	pracaEstado: string;
+	tipoConsumo: "1";	
 
 	// Contato
 	nomeContato?: string;
@@ -58,6 +49,8 @@ export interface CriarService {
 	observacao?: string;
 	user_id: number;
 	organizacao_id: number;
+
+	empresa: number
 }
 
 export async function criarFornecedorService(params: CriarService) {

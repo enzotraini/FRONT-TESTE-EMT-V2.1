@@ -454,7 +454,7 @@ export function FormularioProduto() {
 				blocok: dadosGerais.entrablocok,
 				identific: dadosGerais.identificacao,
 				programa: dadosGerais.proqrama,
-				bitorigi1: Number(dadosGerais.bitolaoriginal) || 0,
+				bitorigi1: Number(dadosGerais.bitolaoriginal1) || 0,
 				bitorigi2: Number(dadosGerais.bitolaoriginal2) || 0,
 				bitorigi3: Number(dadosGerais.bitolaoriginal3) || 0,
 				nrodocto: dadosGerais.nfcompra,
@@ -474,15 +474,16 @@ export function FormularioProduto() {
 					codigo: produtoId,
 					...produto,
 				});
-				setIsLoading(false);
 				toast.success("Produto editado com sucesso!");
+				setIsLoading(false);
 				queryClient.invalidateQueries({ queryKey: ["listar-produtos"] });
 				navigate("/cadastros/produtos");
 			} else {
 				await criarProdutoFn(produto);
-				setIsLoading(false);
-				toast.success("Produto criado com sucesso!");
 				navigate("/cadastros/produtos");
+				toast.success("Produto criado com sucesso!");
+				setIsLoading(false);
+
 			}
 		} catch (error) {
 			setIsLoading(false);
