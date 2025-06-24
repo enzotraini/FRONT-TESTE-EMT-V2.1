@@ -36,8 +36,8 @@ import {
 	Package,
 	DollarSign
 } from "lucide-react";
-import { format } from "date-fns";
-import { ptBR } from "date-fns/locale";
+import dayjs from "dayjs";
+import { formatMoney } from "@/utils/formatMoney";
 
 interface PedidoCompra {
 	id: number;
@@ -150,12 +150,7 @@ export function Compras() {
 		setObservacoes("");
 	};
 
-	const formatarMoeda = (valor: number) => {
-		return new Intl.NumberFormat('pt-BR', {
-			style: 'currency',
-			currency: 'BRL'
-		}).format(valor);
-	};
+
 
 	const getStatusColor = (status: string) => {
 		switch (status) {
@@ -289,9 +284,9 @@ export function Compras() {
 													<p className="text-sm text-gray-500">{pedido.tipoPedido}</p>
 												</div>
 											</TableCell>
-											<TableCell>{format(new Date(pedido.data), "dd/MM/yy", { locale: ptBR })}</TableCell>
-											<TableCell>{format(new Date(pedido.dtEntrega), "dd/MM/yy", { locale: ptBR })}</TableCell>
-											<TableCell className="font-medium">{formatarMoeda(pedido.totalPedido)}</TableCell>
+											<TableCell>{dayjs(pedido.data).format("DD/MM/YY")}</TableCell>
+											<TableCell>{dayjs(pedido.dtEntrega).format("DD/MM/YY")}</TableCell>
+											<TableCell className="font-medium">{formatMoney(pedido.totalPedido)}</TableCell>
 											<TableCell>
 												<Badge variant="outline" className={`text-xs ${getStatusColor(pedido.status)}`}>
 													{pedido.status}
@@ -325,11 +320,11 @@ export function Compras() {
 								<div className="grid grid-cols-2 gap-4 text-sm">
 									<div>
 										<span className="text-gray-500">Total:</span>
-										<p className="font-medium text-lg">{formatarMoeda(pedidoSelecionado.totalPedido)}</p>
+										<p className="font-medium text-lg">{formatMoney(pedidoSelecionado.totalPedido)}</p>
 									</div>
 									<div>
 										<span className="text-gray-500">Entrega:</span>
-										<p className="font-medium">{format(new Date(pedidoSelecionado.dtEntrega), "dd/MM/yyyy", { locale: ptBR })}</p>
+										<p className="font-medium">{dayjs(pedidoSelecionado.dtEntrega).format("DD/MM/YYYY")}</p>
 									</div>
 								</div>
 							</div>
@@ -346,7 +341,7 @@ export function Compras() {
 											<div className="grid grid-cols-2 gap-3">
 												<div>
 													<label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Data</label>
-													<p className="text-sm mt-1">{format(new Date(pedidoSelecionado.data), "dd/MM/yyyy", { locale: ptBR })}</p>
+													<p className="text-sm mt-1">{dayjs(pedidoSelecionado.data).format("DD/MM/YYYY")}</p>
 												</div>
 												<div>
 													<label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Hora</label>
@@ -388,18 +383,18 @@ export function Compras() {
 											<div className="grid grid-cols-2 gap-3">
 												<div>
 													<label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Tot. Mercadoria</label>
-													<p className="text-sm mt-1 font-medium">{formatarMoeda(pedidoSelecionado.totMercador)}</p>
+													<p className="text-sm mt-1 font-medium">{formatMoney(pedidoSelecionado.totMercador)}</p>
 												</div>
 												<div>
 													<label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Total Pedido</label>
-													<p className="text-sm mt-1 font-medium text-lg">{formatarMoeda(pedidoSelecionado.totalPedido)}</p>
+													<p className="text-sm mt-1 font-medium text-lg">{formatMoney(pedidoSelecionado.totalPedido)}</p>
 												</div>
 											</div>
 
 											{pedidoSelecionado.dtBaixa && (
 												<div>
 													<label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Data Baixa</label>
-													<p className="text-sm mt-1">{format(new Date(pedidoSelecionado.dtBaixa), "dd/MM/yyyy HH:mm", { locale: ptBR })}</p>
+													<p className="text-sm mt-1">{dayjs(pedidoSelecionado.dtBaixa).format("DD/MM/YYYY HH:mm")}</p>
 												</div>
 											)}
 
@@ -451,7 +446,7 @@ export function Compras() {
 												<div className="flex-1">
 													<p className="font-medium text-sm">Pedido criado</p>
 													<p className="text-xs text-gray-600 mt-1">Pedido registrado no sistema</p>
-													<span className="text-xs text-gray-500">{format(new Date(pedidoSelecionado.data), "dd/MM/yyyy HH:mm", { locale: ptBR })}</span>
+													<span className="text-xs text-gray-500">{dayjs(pedidoSelecionado.data).format("DD/MM/YYYY HH:mm")}</span>
 												</div>
 											</div>
 											{pedidoSelecionado.dtBaixa && (
@@ -460,7 +455,7 @@ export function Compras() {
 													<div className="flex-1">
 														<p className="font-medium text-sm">Pedido finalizado</p>
 														<p className="text-xs text-gray-600 mt-1">Baixa realizada no sistema</p>
-														<span className="text-xs text-gray-500">{format(new Date(pedidoSelecionado.dtBaixa), "dd/MM/yyyy HH:mm", { locale: ptBR })}</span>
+														<span className="text-xs text-gray-500">{dayjs(pedidoSelecionado.dtBaixa).format("DD/MM/YYYY HH:mm")}</span>
 													</div>
 												</div>
 											)}
