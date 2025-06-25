@@ -47,6 +47,8 @@ export async function authenticate({ email, senha }: AuthenticateBody) {
 		const response = await api.post<AuthenticateResponse>("/auth", { 
 			email, 
 			senha 
+		}, {
+			withCredentials: true
 		});
 		
 		console.log("[authenticate] Resposta recebida 11:", {
