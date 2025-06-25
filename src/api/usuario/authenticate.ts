@@ -59,7 +59,7 @@ export async function authenticate({ email, senha }: AuthenticateBody) {
 		});
 		
 		// Se a resposta não for 204, algo está errado
-		if (response.status !== 204) {
+		if (response.status !== 200) {
 			console.error("[authenticate] Status da resposta inesperado:", response.status);
 			throw new Error(`Status da resposta inesperado: ${response.status}`);
 		}
@@ -73,7 +73,6 @@ export async function authenticate({ email, senha }: AuthenticateBody) {
 		// 	console.log("[authenticate] Headers da resposta:", response.headers);
 		// 	throw new Error("Timeout aguardando cookies de autenticação");
 		// }
-		
 		console.log("[authenticate] Cookies após aguardar:", document.cookie);
 		
 		window.location.href = "/";
