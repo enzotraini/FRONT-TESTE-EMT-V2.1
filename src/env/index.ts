@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 const rawEnv = {
-	VITE_API_URL: "/api",
+	VITE_API_URL: import.meta.env.VITE_API_URL ?? "/api",
 	VITE_API_DELAY: import.meta.env.VITE_API_DELAY ?? "false",
 	VITE_MODE: import.meta.env.MODE ?? "production",
 };
