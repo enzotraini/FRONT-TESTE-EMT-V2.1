@@ -17,6 +17,8 @@ import { FormularioFornecedor } from "@/pages/cadastros/fornecedores/formularios
 import { Fornecedores } from "@/pages/cadastros/fornecedores/fornecedor";
 import { Produtos } from "@/pages/cadastros/produtos/produto";
 import { FormularioProduto } from "@/pages/cadastros/produtos/formularios/FormularioDeProduto";
+import { Vendedores } from "@/pages/cadastros/vendedores/vendedores";
+import { FormularioDeVendedor } from "@/pages/cadastros/vendedores/formularios/FormularioDeVendedor";
 import { AtendimentoCliente } from "@/pages/app/atendimento/AtendimentoCliente";
 import { Compras } from "@/pages/app/pedidos/compras";
 import { Vendas } from "@/pages/app/pedidos/vendas";
@@ -141,6 +143,28 @@ export const routes = createBrowserRouter([
 							{
 								path: "editar/:id",
 								element: <FormularioProduto />,
+							},
+						],
+					},
+					{
+						path: "vendedores",
+						element: <Outlet />,
+						children: [
+							{
+								path: "",
+								element: <Vendedores />,
+							},
+							{
+								path: "novo",
+								element: <FormularioDeVendedor />,
+							},
+							{
+								path: ":id",
+								element: <FormularioDeVendedor />,
+							},
+							{
+								path: "editar/:id",
+								element: <FormularioDeVendedor />,
 							},
 						],
 					},

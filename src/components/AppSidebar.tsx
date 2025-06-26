@@ -135,6 +135,11 @@ export function AppSidebar() {
 											<SidebarMenuItem>Cadastro de Fornecedores</SidebarMenuItem>
 										</Link>
 									</SidebarMenuButton>
+									<SidebarMenuButton asChild>
+										<Link to="/cadastros/vendedores">
+											<SidebarMenuItem>Cadastro de Vendedores</SidebarMenuItem>
+										</Link>
+									</SidebarMenuButton>
 								</SidebarGroupContent>
 							</CollapsibleContent>
 						</SidebarGroup>
