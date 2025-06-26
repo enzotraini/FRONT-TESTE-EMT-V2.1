@@ -64,7 +64,6 @@ export function SignIn() {
 			console.log("[SignIn] Login realizado com sucesso!");
 			console.log("[SignIn] Resposta da API:", response);
 			console.log("[SignIn] Cookies atuais:", document.cookie);
-			debugger
 			// Verifica se há qualquer cookie definido
 			// if (!document.cookie) {
 			// 	console.error("[SignIn] Nenhum cookie encontrado após login");
@@ -73,12 +72,12 @@ export function SignIn() {
 			// }
 
 			// Verifica especificamente o cookie auth_check
-			const hasAuthCheck = document.cookie.includes('auth_check=true');
-			if (!hasAuthCheck) {
-				console.error("[SignIn] Cookie auth_check não encontrado");
-				toast.error("Erro ao fazer login: autenticação incompleta");
-				return;
-			}
+			// const hasAuthCheck = document.cookie.includes('auth_check=true');
+			// if (!hasAuthCheck) {
+			// 	console.error("[SignIn] Cookie auth_check não encontrado");
+			// 	toast.error("Erro ao fazer login: autenticação incompleta");
+			// 	return;
+			// }
 
 			toast.success("Login realizado com sucesso!");
 
