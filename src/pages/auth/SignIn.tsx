@@ -70,13 +70,14 @@ export function SignIn() {
 			// 	toast.error("Erro ao fazer login: cookies não foram definidos");
 			// 	return;
 			// }
+			debugger
 			//Verifica especificamente o cookie auth_check
-			// const hasAuthCheck = document.cookie.includes('auth_check=true');
-			// if (!hasAuthCheck) {
-			// 	console.error("[SignIn] Cookie auth_check não encontrado");
-			// 	toast.error("Erro ao fazer login: autenticação incompleta");
-			// 	return;
-			// }
+			const hasAuthCheck = document.cookie.includes('auth_check=true');
+			if (!hasAuthCheck) {
+				//console.error("[SignIn] Cookie auth_check não encontrado");
+				//toast.error("Erro ao fazer login: autenticação incompleta");
+				//return;
+			}
 
 			toast.success("Login realizado com sucesso!");
 
