@@ -75,7 +75,7 @@ export async function authenticate({ email, senha }: AuthenticateBody) {
 		// }
 		console.log("[authenticate] Cookies após aguardar:", document.cookie);
 		
-		window.location.href = "/";
+		//window.location.href = "/";
 		
 	} catch (error) {
 		console.error("[authenticate] Erro na requisição:", error);

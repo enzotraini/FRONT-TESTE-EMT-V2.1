@@ -64,13 +64,13 @@ export function SignIn() {
 			console.log("[SignIn] Login realizado com sucesso!");
 			console.log("[SignIn] Resposta da API:", response);
 			console.log("[SignIn] Cookies atuais:", document.cookie);
-
+			debugger
 			// Verifica se há qualquer cookie definido
-			if (!document.cookie) {
-				console.error("[SignIn] Nenhum cookie encontrado após login");
-				toast.error("Erro ao fazer login: cookies não foram definidos");
-				return;
-			}
+			// if (!document.cookie) {
+			// 	console.error("[SignIn] Nenhum cookie encontrado após login");
+			// 	toast.error("Erro ao fazer login: cookies não foram definidos");
+			// 	return;
+			// }
 
 			// Verifica especificamente o cookie auth_check
 			const hasAuthCheck = document.cookie.includes('auth_check=true');
