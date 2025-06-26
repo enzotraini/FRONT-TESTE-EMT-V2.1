@@ -70,7 +70,7 @@ export function SignIn() {
 			// 	toast.error("Erro ao fazer login: cookies não foram definidos");
 			// 	return;
 			// }
-
+			debugger
 			//Verifica especificamente o cookie auth_check
 			const hasAuthCheck = document.cookie.includes('auth_check=true');
 			if (!hasAuthCheck) {
