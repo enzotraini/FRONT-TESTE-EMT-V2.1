@@ -128,12 +128,7 @@ export function EmissaoNF() {
 		setItens(itens.filter(item => item.id !== id));
 	};
 
-	const formatarMoeda = (valor: number) => {
-		return new Intl.NumberFormat('pt-BR', {
-			style: 'currency',
-			currency: 'BRL'
-		}).format(valor);
-	};
+
 
 	const totalNota = itens.reduce((acc, item) => acc + item.valorTotal, 0);
 

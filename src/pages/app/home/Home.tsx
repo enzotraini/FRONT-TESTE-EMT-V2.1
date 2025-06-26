@@ -4,6 +4,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import dayjs from "dayjs";
 
 const data = [
 	{ name: "Jan", vendas: 4000, clientes: 2400, pedidos: 150 },
@@ -104,7 +105,7 @@ export function Home() {
 				</div>
 				<div className="flex items-center gap-2">
 					<Calendar className="w-5 h-5" />
-					<span>Hoje, {new Date().toLocaleDateString("pt-BR")}</span>
+					<span>Hoje, {dayjs().format("DD/MM/YYYY")}</span>
 				</div>
 			</div>
 
