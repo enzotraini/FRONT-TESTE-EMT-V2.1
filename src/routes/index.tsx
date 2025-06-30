@@ -5,14 +5,19 @@ import { AppLayout } from "../pages/_layouts/AppLayout";
 import { SignIn } from "../pages/auth/SignIn";
 import { SignUp } from "../pages/auth/SignUp";
 import { ForgotPassword } from "../pages/auth/ForgotPassword";
+import { ResetPassword } from "../pages/auth/ResetPassword";
 import { NotFound } from "../pages/NotFound";
+import { Dashboard } from "@/pages/app/home/Home";
 import { Transportadoras } from "../pages/cadastros/transportadoras/Transportadoras";
 import { FormularioDeTransportadora } from "../pages/cadastros/transportadoras/formulario/FormularioDeTransportadora";
 import { Clientes } from "../pages/app/cadastros/clientes/Clientes";
-import { FormularioDeClientes } from "../pages/app/cadastros/clientes/formulario/FormularioDeCliente";
+import { FormularioDeClientes as FormularioDeCliente } from "../pages/app/cadastros/clientes/formulario/FormularioDeCliente";
 import { RegistrarEntradaPage } from "../pages/app/entrada-mercadoria/RegistrarEntradaPage";
 import ComprasPage from "../pages/pedidos/compras/ComprasPage";
 import { ConfiguracoesPage } from "../pages/configuracoes";
+import { AtendimentoCliente } from "@/pages/app/atendimento/AtendimentoCliente";
+import { ContasReceber } from "@/pages/app/financeiro/contas-receber";
+import { ContasReceberTest } from "@/pages/app/financeiro/contas-receber/ContasReceberTest";
 
 console.log("[ROUTER] Iniciando configuração de rotas...");
 
@@ -198,7 +203,7 @@ const router = createBrowserRouter([
 			},
 			{
 				path: "atendimento-ao-cliente",
-				element: <ProtectedRoute><div>Atendimento ao Cliente</div></ProtectedRoute>,
+				element: <ProtectedRoute><AtendimentoCliente /></ProtectedRoute>,
 			},
 			{
 				path: "nota-fiscal",
@@ -214,7 +219,7 @@ const router = createBrowserRouter([
 				children: [
 					{
 						path: "receber",
-						element: <div>Contas a Receber</div>,
+						element: <ContasReceberTest />,
 					},
 					{
 						path: "pagar",

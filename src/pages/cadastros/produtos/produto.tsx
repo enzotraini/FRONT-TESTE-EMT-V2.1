@@ -175,7 +175,7 @@ export function Produtos() {
 		{ header: 'Tipo Aço', accessor: 'tipoaco' },
 		{ header: 'Local', accessor: 'local' },
 		{ header: 'Tratamento', accessor: 'tratamento' },
-		{ header: 'Observação', accessor: 'obs' },
+		{ header: 'Observação', accessor: 'obs', hidden: true },
 		{ header: 'Tributo', accessor: 'tributo', hidden: true },
 		{ header: 'Class. Fiscal', accessor: 'classifisc', hidden: true },
 		{ header: 'Fornecedor', accessor: 'fornecedor', hidden: true },
@@ -230,29 +230,21 @@ export function Produtos() {
 				</CardHeader>
 
 				<CardContent>
-
-
-					{data ? (
-						<Grid
-							columns={columns}
-							rows={_produtos}
-							getRowKey={(p) => p.sr_recno}
-							showDetails={true}
-							showActions
-							onEdit={(row) => handleEditar(row.sr_recno)}
-							onDelete={(row) => handleExcluir(row.sr_recno, row.codprod)}
-							pagination={{
-								page: data.meta.page,
-								totalPages: data.meta.total,
-							}}
-							onPageChange={handlePageChange}
-							isLoading={isFetching}
-						/>
-					) : (
-						<div className="p-6 text-sm text-muted-foreground">Carregando…</div>
-					)}
-
-
+					<Grid
+						columns={columns}
+						rows={_produtos}
+						getRowKey={(p) => p.sr_recno}
+						showDetails={true}
+						showActions
+						onEdit={(row) => handleEditar(row.sr_recno)}
+						onDelete={(row) => handleExcluir(row.sr_recno, row.codprod)}
+						pagination={{
+							page: data?.meta.page,
+							totalPages: data?.meta.total,
+						}}
+						onPageChange={handlePageChange}
+						isLoading={isFetching}
+					/>
 				</CardContent >
 			</Card >
 		</div >

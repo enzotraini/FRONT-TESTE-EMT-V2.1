@@ -1,0 +1,1 @@
+export { KardexProdutos } from "./KardexProdutos"; 

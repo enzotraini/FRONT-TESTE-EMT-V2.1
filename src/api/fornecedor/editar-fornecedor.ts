@@ -3,7 +3,7 @@ import { api } from "@/lib/axios";
 export interface EditarFornecedorParams {
   codigo: number;
   nome: string;
-  identificador: string;
+  cgcfor: string;
 
   cep: string;
   rua: string;

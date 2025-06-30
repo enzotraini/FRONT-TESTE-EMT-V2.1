@@ -1,0 +1,1 @@
+export { ContasPagar } from "./ContasPagar"; 

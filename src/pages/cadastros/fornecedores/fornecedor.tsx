@@ -55,7 +55,7 @@ export function Fornecedores() {
     resolver: zodResolver(buscarFornecedoresFormSchema),
   });
 
-  const { register, handleSubmit } = buscarFornecedoresForm;
+  // const { register, handleSubmit } = buscarFornecedoresForm;
   const [perPage, setPerPage] = useState(10);
   const [searchParams, setSearchParams] = useSearchParams();
 

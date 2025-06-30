@@ -29,7 +29,7 @@ dayjs.extend(isSameOrBefore);
 
 import { criarProdutoService } from "@/api/produto/criar-service";
 import { toast } from "sonner";
-import { editarProduto } from "@/api/produto/editar-produto";
+import { editarProduto, editarProdutoService } from "@/api/produto/editar-produto";
 import { listarLocais } from "@/api/produto/lista-local";
 
 
@@ -160,7 +160,7 @@ export const dadosGeraisFormSchema = z.object({
 			return parsed.isSameOrBefore(dayjs(), "day");
 		}, { message: "Data não pode ser futura" }),
 	observacao: z.string().max(40, { message: "Máximo de 40 caracteres" }).optional(),
-	observacoesgerais: z.string().optional(),
+	observacoesgerais: z.string().max(500).optional(),
 });
 
 
@@ -180,6 +180,7 @@ export function FormularioProduto() {
 	const { id } = useParams();
 	const produtoId = id;
 	const queryClient = useQueryClient();
+
 	const dadosGeraisForm = useForm<DadosGeraisForm>({
 		resolver: zodResolver(dadosGeraisFormSchema),
 		defaultValues: {
@@ -259,26 +260,26 @@ export function FormularioProduto() {
 		},
 	});
 
-	const { mutateAsync: criarProdutoFn } = useMutation({
-		mutationFn: criarProdutoService,
-		onSuccess: (data) => {
-			console.log("Sucesso na criação do cliente:", data);
-			toast.success("Cliente criado com sucesso!");
-			queryClient.invalidateQueries({ queryKey: ["listar-produtos"] });
-			debugger
-			navigate("/cadastros/produtos");
-		},
-		onError: (error) => {
-			console.error("Erro ao criar cliente:", error);
-			if (error instanceof AxiosError) {
-				console.error("Detalhes do erro:", error.response?.data);
-			}
-			toast.error("Erro ao criar cliente");
-		}
-	});
+	// const { mutateAsync: criarProdutoFn } = useMutation({
+	// 	mutationFn: criarProdutoService,
+	// 	onSuccess: (data) => {
+	// 		queryClient.invalidateQueries({ queryKey: ["listar-produtos"] });
+	// 	},
+	// 	onError: (error) => {
+	// 		console.error("Erro ao criar cliente:", error);
+	// 		if (error instanceof AxiosError) {
+	// 			console.error("Detalhes do erro:", error.response?.data);
+	// 		}
+	// 		toast.error("Erro ao criar cliente");
+	// 	}
+	// });
 
 	const { mutateAsync: editarProdutoFn } = useMutation({
-		mutationFn: editarProduto,
+		mutationFn: editarProdutoService,
+	});
+
+	const { mutateAsync: criarProdutoFn } = useMutation({
+		mutationFn: criarProdutoService,
 	});
 
 	//Listas de Combos
@@ -356,7 +357,7 @@ export function FormularioProduto() {
 	const [pageCorrida, setPageCorrida] = useState(1);
 	const [searchParams, setSearchParams] = useSearchParams();
 	const [corridaSelecionada, setCorridaSelecionada] = useState("");
-	//const { setError, clearErrors } = useFormContext();
+	const [isLoading, setIsLoading] = useState(false);
 
 	const {
 		data: corridaData,
@@ -408,9 +409,7 @@ export function FormularioProduto() {
 
 
 
-
 	const handleSave = async () => {
-
 		// Validar formulário
 		const dadosGeraisValidos = await dadosGeraisForm.trigger();
 		if (!dadosGeraisValidos) {
@@ -421,6 +420,7 @@ export function FormularioProduto() {
 		const dadosGerais = dadosGeraisForm.getValues();
 
 		try {
+			setIsLoading(true);
 			// Montar o objeto no formato que o backend espera
 			const produto = {
 				codprod: dadosGerais.codprod,
@@ -454,7 +454,7 @@ export function FormularioProduto() {
 				blocok: dadosGerais.entrablocok,
 				identific: dadosGerais.identificacao,
 				programa: dadosGerais.proqrama,
-				bitorigi1: Number(dadosGerais.bitolaoriginal) || 0,
+				bitorigi1: Number(dadosGerais.bitolaoriginal1) || 0,
 				bitorigi2: Number(dadosGerais.bitolaoriginal2) || 0,
 				bitorigi3: Number(dadosGerais.bitolaoriginal3) || 0,
 				nrodocto: dadosGerais.nfcompra,
@@ -464,7 +464,7 @@ export function FormularioProduto() {
 				nrocerti: dadosGerais.certificado,
 				fci: dadosGerais.fci,
 				dtcadastro: dadosGerais.datacad,
-				observacoesgerais: dadosGerais.observacoesgerais,
+				texto: dadosGerais.observacoesgerais,
 				user_id: 1,
 				organizacao_id: 1
 			};
@@ -475,14 +475,18 @@ export function FormularioProduto() {
 					...produto,
 				});
 				toast.success("Produto editado com sucesso!");
+				setIsLoading(false);
 				queryClient.invalidateQueries({ queryKey: ["listar-produtos"] });
 				navigate("/cadastros/produtos");
 			} else {
 				await criarProdutoFn(produto);
-				toast.success("Produto criado com sucesso!");
 				navigate("/cadastros/produtos");
+				toast.success("Produto criado com sucesso!");
+				setIsLoading(false);
+
 			}
 		} catch (error) {
+			setIsLoading(false);
 			console.error("Erro ao salvar produto:", error);
 			if (error instanceof AxiosError) {
 				console.error("Detalhes do erro:", error.response?.data);
@@ -526,12 +530,24 @@ export function FormularioProduto() {
 						</Button>
 					</Link>
 
-					<Button onClick={handleSave} disabled={carregandoDadosDoProduto}>
+					<Button className="mr-2" onClick={handleSave} disabled={carregandoDadosDoProduto}>
 						{carregandoDadosDoProduto ? (
 							<Loader className="h-4 w-4 mr-2 animate-spin" />
 						) : null}
 						Salvar
 					</Button>
+					{/* <Button onClick={handleSave} disabled={criandoProduto}>
+						{criandoProduto ? (
+							<>
+								<Loader className="animate-spin mr-2 h-4 w-4" />
+								Salvando...
+							</>
+						) : (
+							"Salvar"
+						)}
+					</Button> */}
+
+
 				</div>
 			</div>
 
@@ -567,6 +583,8 @@ export function FormularioProduto() {
 				carregandoLocal={carregandoLocal}
 				setSearchLocal={setSearchLocal}
 				searchLocal={searchLocal}
+
+				isLoading={isLoading}
 			/>
 		</div>
 	);
