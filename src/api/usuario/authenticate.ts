@@ -47,6 +47,8 @@ export async function authenticate({ email, senha }: AuthenticateBody) {
 		const response = await api.post<AuthenticateResponse>("/auth", { 
 			email, 
 			senha 
+		}, {
+			withCredentials: true
 		});
 		
 		console.log("[authenticate] Resposta recebida 11:", {
@@ -57,7 +59,7 @@ export async function authenticate({ email, senha }: AuthenticateBody) {
 		});
 		
 		// Se a resposta não for 204, algo está errado
-		if (response.status !== 204) {
+		if (response.status !== 200) {
 			console.error("[authenticate] Status da resposta inesperado:", response.status);
 			throw new Error(`Status da resposta inesperado: ${response.status}`);
 		}
@@ -71,10 +73,9 @@ export async function authenticate({ email, senha }: AuthenticateBody) {
 		// 	console.log("[authenticate] Headers da resposta:", response.headers);
 		// 	throw new Error("Timeout aguardando cookies de autenticação");
 		// }
-		
 		console.log("[authenticate] Cookies após aguardar:", document.cookie);
 		
-		window.location.href = "/";
+		//window.location.href = "/";
 		
 	} catch (error) {
 		console.error("[authenticate] Erro na requisição:", error);

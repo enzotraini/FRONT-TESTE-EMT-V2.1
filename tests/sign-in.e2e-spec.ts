@@ -9,7 +9,7 @@ test("Should be able to sign-in with an valid user", async ({ page }) => {
 	await page.getByRole("button", { name: "Entrar no sistema" }).click();
 
 	const title = page.getByRole("heading", {
-		name: "Comercial Aço Fácil",
+		name: "Comercial EMT Consultoria",
 	});
 
 	await title.waitFor({ timeout: 2000 });

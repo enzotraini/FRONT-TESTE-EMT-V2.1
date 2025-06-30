@@ -20,15 +20,15 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { 
-	Calendar, 
-	Clock, 
-	FileText, 
-	Users, 
-	User, 
-	Plus, 
-	Edit, 
-	Trash, 
+import {
+	Calendar,
+	Clock,
+	FileText,
+	Users,
+	User,
+	Plus,
+	Edit,
+	Trash,
 	History,
 	MoreHorizontal,
 	ChevronDown,
@@ -44,8 +44,9 @@ import {
 	XCircle,
 	Clock3
 } from "lucide-react";
-import { format } from "date-fns";
-import { ptBR } from "date-fns/locale";
+import dayjs from "dayjs";
+//import { format } from "date-fns";
+//import { ptBR } from "date-fns/locale";
 
 interface NotaFiscal {
 	id: number;
@@ -80,7 +81,7 @@ export function ControleNotas() {
 		queryFn: async () => {
 			// Simular delay da API
 			await new Promise(resolve => setTimeout(resolve, 1000));
-			
+
 			const mockNotas: NotaFiscal[] = [
 				{
 					id: 137,
@@ -102,7 +103,7 @@ export function ControleNotas() {
 				},
 				{
 					id: 138,
-					serie: "1", 
+					serie: "1",
 					numero: "000138",
 					dtNota: "2025-01-14T14:15:00",
 					cliente: "ASD COMERCIO E SERVIÇOS DE EQUIPAMENTOS ELETRONICOS LTDA",
@@ -121,7 +122,7 @@ export function ControleNotas() {
 				{
 					id: 139,
 					serie: "1",
-					numero: "000139", 
+					numero: "000139",
 					dtNota: "2025-01-13T09:00:00",
 					cliente: "TELL BETEL LTDA",
 					codFiscal: "5.102",
@@ -148,17 +149,17 @@ export function ControleNotas() {
 				}
 			];
 
-			const filteredNotas = search 
-				? mockNotas.filter(n => 
+			const filteredNotas = search
+				? mockNotas.filter(n =>
 					n.cliente.toLowerCase().includes(search.toLowerCase()) ||
 					n.numero.includes(search) ||
 					n.chave.includes(search)
 				)
 				: mockNotas;
 
-			return { 
-				notas: filteredNotas, 
-				meta: { page, perPage, total: filteredNotas.length } 
+			return {
+				notas: filteredNotas,
+				meta: { page, perPage, total: filteredNotas.length }
 			};
 		},
 		initialData: { notas: [], meta: { page, perPage, total: 0 } },
@@ -231,7 +232,7 @@ export function ControleNotas() {
 						<Trash className="h-4 w-4 mr-2" />
 						Cancelar
 					</Button>
-					
+
 					<DropdownMenu>
 						<DropdownMenuTrigger asChild>
 							<Button variant="outline">
@@ -351,9 +352,8 @@ export function ControleNotas() {
 									notasResponse.notas.map((nota) => (
 										<TableRow
 											key={nota.id}
-											className={`cursor-pointer hover:bg-gray-50 transition-colors ${
-												notaSelecionada?.id === nota.id ? "bg-blue-50 border-l-4 border-l-blue-500" : ""
-											}`}
+											className={`cursor-pointer hover:bg-gray-50 transition-colors ${notaSelecionada?.id === nota.id ? "bg-blue-50 border-l-4 border-l-blue-500" : ""
+												}`}
 											onClick={() => handleNotaClick(nota)}
 										>
 											<TableCell className="font-medium">{nota.numero}/{nota.serie}</TableCell>
@@ -363,7 +363,7 @@ export function ControleNotas() {
 													<p className="text-sm text-gray-500">{nota.codFiscal}</p>
 												</div>
 											</TableCell>
-											<TableCell>{format(new Date(nota.dtNota), "dd/MM/yy", { locale: ptBR })}</TableCell>
+											<TableCell>{nota.dtNota ? dayjs(nota.dtNota).format("DD/MM/YYYY") : ''}</TableCell>
 											<TableCell className="font-medium">{formatarMoeda(nota.totalNota)}</TableCell>
 											<TableCell>
 												<Badge variant="outline" className={`text-xs ${getStatusColor(nota.status)}`}>
@@ -400,7 +400,7 @@ export function ControleNotas() {
 										{notaSelecionada.statusNF}
 									</Badge>
 								</div>
-								
+
 								{/* Info rápida */}
 								<div className="grid grid-cols-2 gap-4 text-sm">
 									<div>

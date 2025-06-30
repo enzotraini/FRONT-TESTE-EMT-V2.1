@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 //import { DadosAdicionaisForm, dadosAdicionaisFormSchema } from "@/pages/cadastros/fornecedores/formularios/FormularioDadosAdicionais";
-import { DadosGeraisForm, dadosGeraisFormSchema, FormularioDadosGerais } from "@/pages/cadastros/fornecedores/formularios/FormularioDadosGerais";
+import { FormularioDadosGerais } from "@/pages/cadastros/fornecedores/formularios/FormularioDadosGerais";
 import { formatCep } from "@/utils/formatCep";
 import { formatCpfCnpj } from "@/utils/formatCpfCnpj";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -19,10 +19,11 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { Loader, RotateCw } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
-import { useNavigate, useParams } from "react-router-dom";
+import { useForm, UseFormReturn } from "react-hook-form";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
 import { ListarResponse, listarDaContaContabil } from "@/api/fiscal/listas-produto";
+import { z } from "zod";
 
 const tabTrigger =
 	"data-[state=active]:text-blue-500 data-[state=active]:border-b-2 data-[state=active]:border-blue-500 rounded-none hover:text-accent-foreground gap-2";
@@ -51,28 +52,108 @@ function transformValue<T, K extends keyof T>(
 	return value;
 }
 
+export const tiposIEValidos = ["1", "2", "9"] as const;
+
+export const dadosGeraisFormSchema = z.object({
+	codigo: z.string().optional(),
+	nome: z
+		.string({ required_error: "Nome é obrigatório" })
+		.min(1, "Nome é obrigatório.")
+		.max(100, "Nome deve ter no máximo 100 caracteres."),
+	cgcfor: z
+		.string({ required_error: "CPF/CNPJ é obrigatório." })
+		.min(11, "CPF/CNPJ deve ter no mínimo 11 caracteres.")
+		.max(18, "CPF/CNPJ deve ter no máximo 18 caracteres."),
+	cep: z
+		.string({ required_error: "CEP é obrigatório." })
+		.refine((cep) => cep.replace(/\D/g, "").length === 8, {
+			message: "CEP inválido.",
+		}),
+	//.max(9, "CEP deve ter no máximo 9 caracteres."),
+	endereco: z
+		.string({ required_error: "Rua é obrigatória." })
+		.min(1, "Rua é obrigatória.")
+		.max(100, "Rua deve ter no máximo 100 caracteres."),
+	numero: z.coerce.number(),
+	complemento: z
+		.string()
+		.max(30, "Complemento deve ter no máximo 30 caracteres.")
+		.optional(),
+	bairro: z
+		.string({ required_error: "Bairro é obrigatório." })
+		.min(1, "Bairro é obrigatório.")
+		.max(30, "Bairro deve ter no máximo 30 caracteres."),
+	cidade: z
+		.string({ required_error: "Cidade é obrigatória." })
+		.min(1, "Cidade é obrigatória.")
+		.max(30, "Cidade deve ter no máximo 30 caracteres."),
+	estado: z
+		.string({ required_error: "Estado é obrigatório." })
+		.min(1, "Estado é obrigatório.")
+		.max(2, "Estado deve ter no máximo 2 caracteres."),
+	nomeFantasia: z.string().max(20, "Nome Fantasia deve ter no máximo 20 caracteres.").optional(),
+	observacao: z.string().max(40, "Observação deve ter no máximo 40 caracteres.").optional(),
+	nomeContato: z.string().max(15, "Nome do contato deve ter no máximo 15 caracteres.").optional(),
+	telefone1: z.string().max(15, "Telefone 1 deve ter no máximo 15 caracteres.").optional(),
+	telefone2: z.string().max(15, "Telefone 2 deve ter no máximo 15 caracteres.").optional(),
+	segmento: z.string().max(30, "Segmento deve ter no máximo 30 caracteres.").optional(),
+	site: z.string().max(100, "Site deve ter no máximo 100 caracteres.").optional(),
+	estadualrg: z.string().max(15, "IE deve ter no máximo 15 caracteres.").optional(),
+	tipoie: z.preprocess(
+		(val) => String(val),
+		z.enum(tiposIEValidos, {
+			required_error: "Tipo de IE é obrigatório",
+			invalid_type_error: "Tipo de IE inválido"
+		})
+	),
+	contaContabil: z.string().max(8, "Conta contábil inválida").optional(),
+	emailComercial: z
+		.string()
+		.max(50, "Email comercial deve ter no máximo 50 caracteres.")
+		.refine(
+			(val) => val === "" || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val),
+			{ message: "Email comercial inválido." }
+		)
+		.optional(),
+	emailFiscal: z
+		.string()
+		.max(100, "Email fiscal deve ter no máximo 100 caracteres.")
+		.refine(
+			(val) => val === "" || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val),
+			{ message: "Email fiscal inválido." }
+		)
+		.optional(),
+});
+
+export type DadosGeraisForm = z.infer<typeof dadosGeraisFormSchema>;
+
+interface FormularioDadosGeraisProps {
+	dadosGeraisForm: UseFormReturn<DadosGeraisForm>;
+}
+
 export function FormularioFornecedor() {
 	const navigate = useNavigate();
 	const { id } = useParams();
 	const fornecedorId = id;
 	const queryClient = useQueryClient();
+	const [isLoading, setIsLoading] = useState(false);
 
 	const dadosGeraisForm = useForm<DadosGeraisForm>({
 		resolver: zodResolver(dadosGeraisFormSchema),
 		defaultValues: {
 			nome: "",
 			//tipo: "fisica",
-			identificador: "",
+			cgcfor: "",
 			cep: "",
-			rua: "",
+			endereco: "",
 			numero: 0,
 			complemento: "",
 			bairro: "",
 			cidade: "",
 			estado: "",
 			estadualrg: "",
-			tipoie: 0,
-			ctacontabi: "",
+			tipoie: undefined,
+			contaContabil: "",
 			nomeFantasia: "",
 			observacao: "",
 			nomeContato: "",
@@ -139,25 +220,29 @@ export function FormularioFornecedor() {
 	// 	carregandoContaContabil,
 	// };
 
-	const { mutateAsync: criarFornecedorFn } = useMutation({
-		mutationFn: criarFornecedorService,
-		onSuccess: (data) => {
-			console.log("Sucesso na criação do cliente:", data);
-			toast.success("Cliente criado com sucesso!");
-			queryClient.invalidateQueries({ queryKey: ["listar-fornecedores"] });
-			navigate("/cadastros/fornecedores");
-		},
-		onError: (error) => {
-			console.error("Erro ao criar cliente:", error);
-			if (error instanceof AxiosError) {
-				console.error("Detalhes do erro:", error.response?.data);
-			}
-			toast.error("Erro ao criar cliente");
-		}
-	});
+	// const { mutateAsync: criarFornecedorFn } = useMutation({
+	// 	mutationFn: criarFornecedorService,
+	// 	onSuccess: (data) => {
+	// 		console.log("Sucesso na criação do cliente:", data);
+	// 		toast.success("Cliente criado com sucesso!");
+	// 		queryClient.invalidateQueries({ queryKey: ["listar-fornecedores"] });
+	// 		navigate("/cadastros/fornecedores");
+	// 	},
+	// 	onError: (error) => {
+	// 		console.error("Erro ao criar cliente:", error);
+	// 		if (error instanceof AxiosError) {
+	// 			console.error("Detalhes do erro:", error.response?.data);
+	// 		}
+	// 		toast.error("Erro ao criar cliente");
+	// 	}
+	// });
 
 	const { mutateAsync: editarFornecedorFn } = useMutation({
 		mutationFn: editarFornecedor,
+	});
+
+	const { mutateAsync: criarFornecedorFn } = useMutation({
+		mutationFn: criarFornecedorService,
 	});
 
 	useEffect(() => {
@@ -202,43 +287,32 @@ export function FormularioFornecedor() {
 		// Validar formulários
 		const dadosGeraisValidos = await dadosGeraisForm.trigger();
 
-		console.log("Validação dos formulários:", {
-			dadosGeraisValidos,
-		});
-
-		const dadosGerais1 = dadosGeraisForm.getValues();
-		console.log("📦 Dados do formulário:", dadosGerais1);
-
 		if (!dadosGeraisValidos) {
-			console.log("Formulários inválidos, abortando...");
+			console.log("Formulário inválido");
 			return;
 		}
 
 		const dadosGerais = dadosGeraisForm.getValues();
-		//const dadosAdicionais = dadosAdicionaisForm.getValues();		
-
-		console.log("Dados coletados dos formulários:", {
-			dadosGerais,
-		});
 
 		try {
+			setIsLoading(true);
 			// Limpar e validar o CPF/CNPJ
-			const identificadorLimpo = dadosGerais?.identificador.replace(/\D/g, "");
-			
+			const identificadorLimpo = dadosGerais?.cgcfor.replace(/\D/g, "");
+
 			if (identificadorLimpo.length !== 11 && identificadorLimpo.length !== 14) {
 				toast.error("CPF deve ter 11 dígitos ou CNPJ deve ter 14 dígitos");
 				return;
 			}
-
+			debugger
 			// Preparar dados no formato que o backend espera
 			const dadosBase = {
 				// Dados Gerais
 				codigo: dadosGerais?.codigo || "",
 				nome: dadosGerais?.nome,
-				identificador: identificadorLimpo, // Campo correto para o backend
+				cgcfor: identificadorLimpo, // Campo correto para o backend
 				// Endereço
-				rua: dadosGerais?.rua,
-				numero: Number(dadosGerais?.numero) || 0,
+				endereco: dadosGerais?.endereco,
+				nro: Number(dadosGerais?.numero) || null,
 				complemento: dadosGerais?.complemento || "",
 				bairro: dadosGerais?.bairro,
 				cidade: dadosGerais?.cidade,
@@ -257,6 +331,7 @@ export function FormularioFornecedor() {
 				contaContabil: dadosGerais?.contaContabil || "",
 				emailComercial: dadosGerais?.emailComercial || "",
 				emailFiscal: dadosGerais?.emailFiscal || "",
+				empresa: "001"
 			};
 
 			console.log("Dados preparados para envio:", dadosBase);
@@ -269,10 +344,15 @@ export function FormularioFornecedor() {
 				toast.success("Fornecedor editado com sucesso!");
 				queryClient.invalidateQueries({ queryKey: ["listar-fornecedores"] });
 				navigate("/cadastros/fornecedores");
+				setIsLoading(false);
 			} else {
 				await criarFornecedorFn(dadosBase);
+				navigate("/cadastros/fornecedores");
+				toast.success("Fornecedor criado com sucesso!");
+				setIsLoading(false);
 			}
 		} catch (error) {
+			setIsLoading(false);
 			console.error("Erro ao salvar fornecedor:", error);
 			if (error instanceof AxiosError) {
 				console.error("Detalhes do erro:", error.response?.data);
@@ -300,16 +380,12 @@ export function FormularioFornecedor() {
 					{fornecedorId ? "Editar Fornecedor" : "Novo Fornecedor"}
 				</h1>
 				<div className="flex gap-2">
-					{fornecedorId ? "" :
-						<Button
-							variant="outline"
-							onClick={handleReset}
-							disabled={carregandoDadosDoFornecedor}
-						>
-							<RotateCw className="h-4 w-4 mr-2" />
-							Resetar
-						</Button>}
-					<Button onClick={handleSave} disabled={carregandoDadosDoFornecedor}>
+					<Link to="/cadastros/fornecedores">
+						<Button type="button" variant="outline" className="h-10">
+							Cancelar
+						</Button>
+					</Link>
+					<Button className=" mr-2" onClick={handleSave} disabled={carregandoDadosDoFornecedor}>
 						{carregandoDadosDoFornecedor ? (
 							<Loader className="h-4 w-4 mr-2 animate-spin" />
 						) : null}
@@ -326,6 +402,7 @@ export function FormularioFornecedor() {
 				carregandoContaContabil={carregandoContaContabil}
 				setSearchConta={setSearch} // função que altera o search
 				searchConta={search}
+				isLoading={isLoading}
 			/>
 		</div>
 	);

@@ -17,8 +17,8 @@ import {
   buscarFornecedores,
   type FornecedorDaListagem,
 } from "@/api/fornecedor/buscar-fornecedor";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -29,7 +29,11 @@ import {
 import { Botoes } from "@/pages/cadastros/fornecedores/Botoes";
 import { deletarFornecedor } from "@/api/fornecedor/deletar-fornecedor";
 import { watch } from "fs";
-import { Edit, Trash2 } from "lucide-react";
+import { Edit, Plus, Search, Trash2 } from "lucide-react";
+import { Column, Grid } from "@/components/Grid";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { toast } from "sonner";
 
 
 const buscarFornecedoresFormSchema = z.object({
@@ -44,93 +48,14 @@ export function Fornecedores() {
 
   function handleEditar(id: number) {
     navigate(`/cadastros/fornecedores/editar/${id}`);
-  }  
+  }
 
 
   const buscarFornecedoresForm = useForm<BuscarFornecedoresData>({
     resolver: zodResolver(buscarFornecedoresFormSchema),
   });
 
-  const columns: ColumnDef<FornecedorDaListagem>[] = [	
-	{
-	  accessorKey: "codigo",
-	  header: "Código",
-	  size: 60,
-	},
-	{
-	  accessorKey: "nome",
-	  header: "Nome",
-	  size: 300,
-	},
-	{
-	  accessorKey: "fantasia",
-	  header: "Fantasia",
-	  size: 200,
-	},
-	{
-	  accessorKey: "cgcfor",
-	  header: "CNPJ/CPF",
-	  size: 120,
-	},
-	{
-	  accessorKey: "contato",
-	  header: "Contato",
-	  size: 170,
-	},
-	{
-	  accessorKey: "telefone1",
-	  header: "Telefone 1",
-	  size: 150,
-	},
-	{
-	  accessorKey: "telefone2",
-	  header: "Telefone 2",
-	  size: 150,
-	},
-	{
-	  accessorKey: "segmento",
-	  header: "Segmento",
-	  size: 160,
-	},
-	{
-		id: "actions",
-		header: "Ações",
-		cell: ({ row }) => {
-		  const id = row.getValue("codigo");
-		  const nome = (row.getValue("nome") as string)?.trim();
-	  
-		  return (
-			<div className="flex items-center gap-2">
-			  <button
-				onClick={() => handleEditar(id)}
-				className="text-blue-500 hover:text-blue-700"
-				title="Editar"
-			  >
-				<Edit className="w-4 h-4" />
-			  </button>
-	  
-			  <button
-				 onClick={() => {
-					const confirmar = window.confirm(
-					  `Deseja realmente excluir o fornecedor "${nome}"?`,
-					);
-					if (confirmar) {
-					  deletarFornecedorFn({ fornecedorId: id }).then(() => {
-						window.location.reload();
-					  });
-					}
-				  }}
-				>
-				  <Trash2 className="w-4 h-4 text-red-500" />
-			  </button>
-			</div>
-		  );
-		},
-		size: 100,
-	  },	  
-  ];  
-
-  const { register, handleSubmit } = buscarFornecedoresForm;
+  // const { register, handleSubmit } = buscarFornecedoresForm;
   const [perPage, setPerPage] = useState(10);
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -153,9 +78,22 @@ export function Fornecedores() {
       staleTime: 0,
     });
 
-  const { mutateAsync: deletarFornecedorFn } = useMutation({
+  // const { mutateAsync: deletarFornecedorFn } = useMutation({
+  //   mutationFn: deletarFornecedor,
+  // });
+
+  const queryClient = useQueryClient()
+
+  const { mutate: deletarFornecedorFn } = useMutation({
     mutationFn: deletarFornecedor,
-  });
+    onSuccess: () => {
+      toast.success("Fornecedor excluído")
+      queryClient.invalidateQueries({ queryKey: ["fornecedores"] })
+    },
+    onError: () => {
+      toast.error("Falha ao excluir produto")
+    },
+  })
 
   async function handlePageChange(page: number) {
     if (page < 1) page = 1;
@@ -175,52 +113,99 @@ export function Fornecedores() {
 
   const searchWatched = buscarFornecedoresForm.watch("search") ?? "";
 
-useEffect(() => {
-	if (searchWatched.length >= 3 || searchWatched.length === 0) {
-		setSearchParams((prev) => {
-			const newParams = new URLSearchParams(prev);
-			newParams.set("search", searchWatched); // mantém a page atual!
-			return newParams;
-		});
-	}
-}, [searchWatched, setSearchParams]);
+  useEffect(() => {
+    if (searchWatched.length >= 3 || searchWatched.length === 0) {
+      setSearchParams((prev) => {
+        const newParams = new URLSearchParams(prev);
+        newParams.set("search", searchWatched); // mantém a page atual!
+        return newParams;
+      });
+    }
+  }, [searchWatched, setSearchParams]);
 
-	  
+  function handleExcluir(id: number, codprod: number) {
+    const confirmar = window.confirm(
+      `Deseja realmente excluir o fornecedor "${codprod}"?`
+    );
+    if (confirmar) deletarFornecedorFn({ fornecedorId: id });
+  }
+
+  const columns: Column<FornecedorDaListagem>[] = [
+    { header: "Código", accessor: "codigo", className: "w-24" },
+    { header: "Nome", accessor: "nome", className: "w-80" },
+    { header: "Fantasia", accessor: "fantasia", className: "w-72" },
+    { header: "CNPJ/CPF", accessor: "cgcfor", className: "w-60" },
+
+    /* ─── colunas invisíveis ─── */
+    { header: "Contato", accessor: "contato" },
+    { header: "Telefone 1", accessor: "telefone1", hidden: true },
+    { header: "Telefone 2", accessor: "telefone2", hidden: true },
+    { header: "Segmento", accessor: "segmento", hidden: true },
+  ]
 
   return (
-    <section className="flex flex-col w-full max-h-screen">
-      <Botoes fornecedoresSelecionados={itensSelecionados} />
-      <nav className="p-2 flex gap-2 bg-gray-50 border-b border-b-gray-200 dark:bg-gray-950 border-b dark:border-b-gray-800">
-        <Form {...buscarFornecedoresForm}>
-          <form onSubmit={handleSubmit(searchFornecedores)}>
-            <FormField
-              name="nome"
-              render={() => (
-                <FormControl>
-                  <SearchInput
-                    className="max-w-80 w-full"
-                    placeholder="Pesquisar"
-                    {...register("search")}
-                  />
-                </FormControl>
-              )}
-            />
-          </form>
-        </Form>
-        {/* <Button variant="ghost">Ficha de Crédito</Button>
-        <Button variant="ghost">Histórico de Alteração</Button> */}
-      </nav>
-      <DataTable
-        meta={{
-          page: buscarFornecedoresResponse.meta?.page,
-          perPage: buscarFornecedoresResponse.meta?.perPage,
-          total: buscarFornecedoresResponse.meta?.total,
-        }}
-        isLoading={buscandoFornecedores}
-        onChangePage={handlePageChange}
-        data={buscarFornecedoresResponse.fornecedores}
-        columns={columns}
-      />
-    </section>
+    <div className="flex flex-col gap-6">
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold">Fornecedor</h1>
+        <Link to="/cadastros/fornecedores/novo">
+          <Button className="px-2 py-1 text-sm h-8 mr-2">
+            <Plus className="mr-2 h-3 w-3" />
+            Novo Fornecedor
+          </Button>
+        </Link>
+      </div>
+      <Card>
+        <CardHeader>
+          <Form {...buscarFornecedoresForm}>
+            <div className="flex items-center justify-between">
+              <div className="flex flex-col">
+                <span className="text-sm text-muted-foreground mb-4">
+                  <Link to="/" className="hover:underline text-primary">
+                    Home
+                  </Link>{" "} / cadastro / Fornecedor
+                </span>
+                <CardTitle>Lista de Fornecedores</CardTitle>
+              </div>
+              <div className="flex w-72 items-center space-x-2">
+                <FormField
+                  name="search"
+                  control={buscarFornecedoresForm.control}
+                  render={({ field }) => (
+                    <FormControl>
+                      <div className="relative w-full">
+                        <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          placeholder="Buscar produto..."
+                          {...field}
+                          className="pl-8"
+                        />
+                      </div>
+                    </FormControl>
+                  )}
+                />
+              </div>
+            </div>
+          </Form>
+        </CardHeader>
+
+        <CardContent>
+          <Grid
+            columns={columns}
+            rows={buscarFornecedoresResponse.fornecedores}
+            getRowKey={(p) => p.codigo}
+            showDetails={true}
+            showActions
+            onEdit={(row) => handleEditar(row.codigo)}
+            onDelete={(row) => handleExcluir(row.codigo, row.codigo)}
+            pagination={{
+              page: buscarFornecedoresResponse.meta.page,
+              totalPages: buscarFornecedoresResponse.meta.total,
+            }}
+            onPageChange={handlePageChange}
+            isLoading={buscandoFornecedores}
+          />
+        </CardContent >
+      </Card >
+    </div >
   );
 }

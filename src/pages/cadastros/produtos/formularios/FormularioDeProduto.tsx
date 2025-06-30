@@ -16,14 +16,21 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { Loader, RotateCw } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useForm, UseFormReturn } from "react-hook-form";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { useForm, useFormContext, UseFormReturn } from "react-hook-form";
+import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { z } from "zod";
 import { listarClassifisc, listarCsosn, listarAtributo, ListarResponse, BuscarCorridasResponse, buscarCorridas } from "@/api/fiscal/listas-produto";
 import dayjs from "dayjs";
+import customParseFormat from "dayjs/plugin/customParseFormat";
+import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
+
+dayjs.extend(customParseFormat);
+dayjs.extend(isSameOrBefore);
+
 import { criarProdutoService } from "@/api/produto/criar-service";
 import { toast } from "sonner";
-import { editarProduto } from "@/api/produto/editar-produto";
+import { editarProduto, editarProdutoService } from "@/api/produto/editar-produto";
+import { listarLocais } from "@/api/produto/lista-local";
 
 
 type DadosGerais = BuscarDadosCompletosDoProdutoResponse["dadosGerais"];
@@ -56,42 +63,37 @@ function transformValue<T, K extends keyof T>(
 }
 
 export const dadosGeraisFormSchema = z.object({
-	codprod: z.string().min(1, { message: "Código é obrigatório" }).max(20),
-	lote: z.string().max(1).optional(),
-	identific: z.string().max(1).optional(),
-	tipo: z.string().max(20).optional(),
-	secao: z.string().max(2).optional(),
-	acab: z.string().max(3).optional(),
-	descricao: z.string().max(40).optional(),
-	unidade: z.string().max(3).optional(),
-	titulo: z.string().max(35).optional(),
-	marca: z.string().max(15).optional(),
-	obs: z.string().max(20).optional(),
+	codprod: z.string().min(1, { message: "Código é obrigatório" }).max(20, { message: "Máximo de 20 caracteres" }),
+	lote: z.string().max(1, { message: "Máximo de 1 caractere" }).optional(),
+	identific: z.string().max(1, { message: "Máximo de 1 caractere" }).optional(),
+	tipo: z.string().max(20, { message: "Máximo de 20 caracteres" }).optional(),
+	secao: z.string().max(2, { message: "Máximo de 2 caracteres" }).optional(),
+	acab: z.string().max(3, { message: "Máximo de 3 caracteres" }).optional(),
+	descricao: z.string().max(40, { message: "Máximo de 40 caracteres" }).optional(),
+	unidade: z.string().max(3, { message: "Máximo de 3 caracteres" }).optional(),
+	titulo: z.string().max(35, { message: "Máximo de 35 caracteres" }).optional(),
+	marca: z.string().max(15, { message: "Máximo de 15 caracteres" }).optional(),
+	obs: z.string().max(20, { message: "Máximo de 20 caracteres" }).optional(),
 
-	estoqueatual: z.coerce.number()
-		.max(999999.999, "Máximo permitido é 999999.999")
-		.refine(val => Number.isFinite(val) && Number((val * 1000) % 1) === 0, {
-			message: "Até 3 casas decimais permitidas",
-		})
-		.optional(),
-	estoqueminimo: z.coerce.number().optional(),    // numeric(9,3)
-	custoreal: z.coerce.number().optional(),        // numeric(12,2)
-	custorealporc: z.coerce.number().optional(),    // CUSTOREAL1
-	precovenda: z.coerce.number().optional(),       // numeric(12,2)
+	estoqueatual: z.number().optional(),
+	estoqueminimo: z.coerce.number().optional(),
+	custoreal: z.coerce.number().optional(),
+	custorealporc: z.coerce.number().optional(),
+	precovenda: z.coerce.number().optional(),
 
-	classifisc: z.string().max(15).optional(),
-	tributo: z.string().max(4).optional(),
-	csosn: z.string().max(4).optional(),
+	classifisc: z.string().max(15, { message: "Máximo de 15 caracteres" }).optional(),
+	tributo: z.string().max(4, { message: "Máximo de 4 caracteres" }).optional(),
+	csosn: z.string().max(4, { message: "Máximo de 4 caracteres" }).optional(),
 
-	entrablocok: z.boolean().optional(),                       // bit
-	unidadeblocok: z.string().max(2).optional(),            // UNIDBLOCOK
-	codprodutoblocok: z.string().max(20).optional(),           // COD_ITEM_K
+	entrablocok: z.boolean().optional(),
+	unidadeblocok: z.string().max(2, { message: "Máximo de 2 caracteres" }).optional(),
+	codprodutoblocok: z.string().max(20, { message: "Máximo de 20 caracteres" }).optional(),
 
-	corrida: z.string().max(15).optional(),
-	tipoaco: z.string().max(2).optional(),
-	tratamento: z.string().max(3).optional(),
+	corrida: z.string().max(15, { message: "Máximo de 15 caracteres" }).optional().or(z.literal("")),
+	tipoaco: z.string().max(2, { message: "Máximo de 2 caracteres" }).optional(),
+	tratamento: z.string().max(3, { message: "Máximo de 3 caracteres" }).optional(),
 
-	texto: z.string().max(16).optional(),
+	texto: z.string().max(16, { message: "Máximo de 16 caracteres" }).optional(),
 
 	bitola1: z.coerce.number().optional(),
 	bitola2: z.coerce.number().optional(),
@@ -103,70 +105,64 @@ export const dadosGeraisFormSchema = z.object({
 
 	compriment: z.coerce.number().optional(),
 
-	identificacao: z.string().max(1).optional(),    // IDENTIFIC
-	proqrama: z.string().max(10).optional(),        // PROGRAMA
-	bitolaoriginal1: z.coerce.number().optional(),   // BITORIGI1 
-	bitolaoriginal2: z.coerce.number().optional(),   // BITORIGI2 
-	bitolaoriginal3: z.coerce.number().optional(),   // BITORIGI3 
-	barras: z.coerce.number().optional(),           // numeric(3,0)
-	comprimento: z.coerce.number().optional(),      // numeric(3,0)
-	local: z.string().max(2).optional(),
+	identificacao: z.string().max(1, { message: "Máximo de 1 caractere" }).optional(),
+	proqrama: z.string().max(10, { message: "Máximo de 10 caracteres" }).optional(),
+	bitolaoriginal1: z.coerce.number().optional(),
+	bitolaoriginal2: z.coerce.number().optional(),
+	bitolaoriginal3: z.coerce.number().optional(),
+	barras: z.coerce.number()
+		.int({ message: "Deve ser um número inteiro" })
+		.min(0, { message: "Valor mínimo é 0" })
+		.max(999, { message: "Máximo de 3 dígitos" })
+		.optional(),
+	comprimento: z.coerce.number().optional(),
+	local: z.string().max(20, { message: "Máximo de 20 caracteres" }).optional(),
 
-	nfcompra: z.string().max(8).optional(),         // NRODOCTO
-	datacompra: z
-		.string()
-		.max(10)
+	nfcompra: z.string().max(8, { message: "Máximo de 8 caracteres" }).optional(),
+	datacompra: z.string()
+		.max(10, { message: "Máximo de 10 caracteres" })
 		.optional()
-		.refine((value) => {
+		.refine(value => {
 			if (!value) return true;
-			return dayjs(value, "DD/MM/YYYY", true).isValid();
+			const parsed = dayjs(value, "DD/MM/YYYY", true);
+			return parsed.isValid();
 		}, { message: "Data inválida" })
-		.refine((value) => {
+		.refine(value => {
 			if (!value) return true;
-			const date = dayjs(value, "DD/MM/YYYY", true);
-			return date.isAfter(dayjs("31/12/2018", "DD/MM/YYYY"));
+			const parsed = dayjs(value, "DD/MM/YYYY", true);
+			return parsed.isAfter("2018-12-31");
 		}, { message: "Data deve ser após 31/12/2018" })
-		.refine((value) => {
+		.refine(value => {
 			if (!value) return true;
-			const date = dayjs(value, "DD/MM/YYYY", true);
-			return date.isBefore(dayjs());
-		}, { message: "Data não pode ser futura" }).optional(),
-	custocompra: z.coerce.number().optional(),      // CUSULTCPA
-	fornecedor: z.string().max(40).optional(),      // FORNECEDOR
-	certificado: z.string().max(10).optional(),     // NROCERTI
-
-	fci: z.string().max(36).optional(),
-	datacad: z
-		.string()
-		.max(10)
+			const parsed = dayjs(value, "DD/MM/YYYY", true);
+			return parsed.isSameOrBefore(dayjs(), "day");
+		}, { message: "Data não pode ser futura" }),
+	custocompra: z.coerce.number().optional(),
+	fornecedor: z.string().max(40, { message: "Máximo de 40 caracteres" }).optional(),
+	certificado: z.string().max(10, { message: "Máximo de 10 caracteres" }).optional(),
+	fci: z.string().max(36, { message: "Máximo de 36 caracteres" }).optional(),
+	datacad: z.string()
+		.max(10, { message: "Máximo de 10 caracteres" })
 		.optional()
-		.refine(
-			(value) => {
-				if (!value) return true; // se for opcional
-				const date = dayjs(value, "DD/MM/YYYY", true);
-				return date.isValid();
-			},
-			{ message: "Data inválida" }
-		)
-		.refine(
-			(value) => {
-				if (!value) return true;
-				const date = dayjs(value, "DD/MM/YYYY", true);
-				return date.isAfter("2018-12-31");
-			},
-			{ message: "Data deve ser após 31/12/2018" }
-		)
-		.refine(
-			(value) => {
-				if (!value) return true;
-				const date = dayjs(value, "DD/MM/YYYY", true);
-				return date.isBefore(dayjs());
-			},
-			{ message: "Data não pode ser futura" }
-		).optional(),
-	observacao: z.string().max(40).optional(),      // TEXTO pode ser separado se for textarea
-	observacoesgerais: z.string().optional(),       // mapeável para TEXTO ou outro campo
+		.refine(value => {
+			if (!value) return true;
+			const parsed = dayjs(value, "DD/MM/YYYY", true);
+			return parsed.isValid();
+		}, { message: "Data inválida" })
+		.refine(value => {
+			if (!value) return true;
+			const parsed = dayjs(value, "DD/MM/YYYY", true);
+			return parsed.isAfter("2018-12-31");
+		}, { message: "Data deve ser após 31/12/2018" })
+		.refine(value => {
+			if (!value) return true;
+			const parsed = dayjs(value, "DD/MM/YYYY", true);
+			return parsed.isSameOrBefore(dayjs(), "day");
+		}, { message: "Data não pode ser futura" }),
+	observacao: z.string().max(40, { message: "Máximo de 40 caracteres" }).optional(),
+	observacoesgerais: z.string().max(500).optional(),
 });
+
 
 export type DadosGeraisForm = z.infer<typeof dadosGeraisFormSchema>;
 
@@ -184,6 +180,7 @@ export function FormularioProduto() {
 	const { id } = useParams();
 	const produtoId = id;
 	const queryClient = useQueryClient();
+
 	const dadosGeraisForm = useForm<DadosGeraisForm>({
 		resolver: zodResolver(dadosGeraisFormSchema),
 		defaultValues: {
@@ -263,31 +260,33 @@ export function FormularioProduto() {
 		},
 	});
 
-	const { mutateAsync: criarProdutoFn } = useMutation({
-		mutationFn: criarProdutoService,
-		onSuccess: (data) => {
-			console.log("Sucesso na criação do cliente:", data);
-			toast.success("Cliente criado com sucesso!");
-			queryClient.invalidateQueries({ queryKey: ["listar-produtos"] });
-			navigate("/cadastros/produtos");
-		},
-		onError: (error) => {
-			console.error("Erro ao criar cliente:", error);
-			if (error instanceof AxiosError) {
-				console.error("Detalhes do erro:", error.response?.data);
-			}
-			toast.error("Erro ao criar cliente");
-		}
-	});
+	// const { mutateAsync: criarProdutoFn } = useMutation({
+	// 	mutationFn: criarProdutoService,
+	// 	onSuccess: (data) => {
+	// 		queryClient.invalidateQueries({ queryKey: ["listar-produtos"] });
+	// 	},
+	// 	onError: (error) => {
+	// 		console.error("Erro ao criar cliente:", error);
+	// 		if (error instanceof AxiosError) {
+	// 			console.error("Detalhes do erro:", error.response?.data);
+	// 		}
+	// 		toast.error("Erro ao criar cliente");
+	// 	}
+	// });
 
 	const { mutateAsync: editarProdutoFn } = useMutation({
-		mutationFn: editarProduto,
+		mutationFn: editarProdutoService,
+	});
+
+	const { mutateAsync: criarProdutoFn } = useMutation({
+		mutationFn: criarProdutoService,
 	});
 
 	//Listas de Combos
 	const [searchClassifisc, setSearchClassifisc] = useState("");
 	const [searchAtributo, setSearchAtributo] = useState("");
 	const [searchCsosn, setSearchCsosn] = useState("");
+	const [searchLocal, setSearchLocal] = useState("");
 
 	const {
 		data: classifiscData,
@@ -322,6 +321,22 @@ export function FormularioProduto() {
 	});
 
 	const {
+		data: localData,
+		isFetching: carregandoLocal,
+		failureReason: falhaAoBuscarLocal,
+	} = useQuery({
+		queryKey: ["listar-local", searchLocal],
+		queryFn: () => listarLocais(searchLocal ?? ""),
+		enabled: searchLocal === "" || searchLocal.length > 3,
+		staleTime: 1000 * 60 * 5,
+		retry: (retries, error) => {
+			if (!(error instanceof AxiosError)) return false;
+			if (error.status && error.status >= 400 && error.status <= 499) return false;
+			return retries <= 2;
+		},
+	});
+
+	const {
 		data: csosnData,
 		isFetching: carregandoCsosn,
 		failureReason: falhaAoBuscarCsosn,
@@ -342,6 +357,7 @@ export function FormularioProduto() {
 	const [pageCorrida, setPageCorrida] = useState(1);
 	const [searchParams, setSearchParams] = useSearchParams();
 	const [corridaSelecionada, setCorridaSelecionada] = useState("");
+	const [isLoading, setIsLoading] = useState(false);
 
 	const {
 		data: corridaData,
@@ -362,6 +378,22 @@ export function FormularioProduto() {
 		});
 	};
 
+	// async function validarCorrida() {
+	// 	if (!corridaSelecionada) return;
+
+	// 	try {
+	// 		const resultado = await buscarCorridas({ search: corridaSelecionada, page: 1, perPage: 1 });
+
+	// 		if (!resultado.corridas || resultado.corridas.length === 0) {
+	// 			setError("corrida", { message: "Corrida inexistente na base" });
+	// 		} else {
+	// 			clearErrors("corrida");
+	// 		}
+	// 	} catch (error) {
+	// 		setError("corrida", { message: "Erro ao validar corrida" });
+	// 	}
+	// }
+
 	useEffect(() => {
 		if (!dadosDoProduto || !dadosDoProduto.dadosGerais) return;
 
@@ -376,9 +408,8 @@ export function FormularioProduto() {
 	}, [dadosDoProduto, setValueDadosGerais]);
 
 
-	const handleSave = async () => {
-		debugger;
 
+	const handleSave = async () => {
 		// Validar formulário
 		const dadosGeraisValidos = await dadosGeraisForm.trigger();
 		if (!dadosGeraisValidos) {
@@ -389,6 +420,7 @@ export function FormularioProduto() {
 		const dadosGerais = dadosGeraisForm.getValues();
 
 		try {
+			setIsLoading(true);
 			// Montar o objeto no formato que o backend espera
 			const produto = {
 				codprod: dadosGerais.codprod,
@@ -422,7 +454,7 @@ export function FormularioProduto() {
 				blocok: dadosGerais.entrablocok,
 				identific: dadosGerais.identificacao,
 				programa: dadosGerais.proqrama,
-				bitorigi1: Number(dadosGerais.bitolaoriginal) || 0,
+				bitorigi1: Number(dadosGerais.bitolaoriginal1) || 0,
 				bitorigi2: Number(dadosGerais.bitolaoriginal2) || 0,
 				bitorigi3: Number(dadosGerais.bitolaoriginal3) || 0,
 				nrodocto: dadosGerais.nfcompra,
@@ -432,7 +464,7 @@ export function FormularioProduto() {
 				nrocerti: dadosGerais.certificado,
 				fci: dadosGerais.fci,
 				dtcadastro: dadosGerais.datacad,
-				observacoesgerais: dadosGerais.observacoesgerais,
+				texto: dadosGerais.observacoesgerais,
 				user_id: 1,
 				organizacao_id: 1
 			};
@@ -443,14 +475,18 @@ export function FormularioProduto() {
 					...produto,
 				});
 				toast.success("Produto editado com sucesso!");
+				setIsLoading(false);
 				queryClient.invalidateQueries({ queryKey: ["listar-produtos"] });
 				navigate("/cadastros/produtos");
 			} else {
 				await criarProdutoFn(produto);
-				toast.success("Produto criado com sucesso!");
 				navigate("/cadastros/produtos");
+				toast.success("Produto criado com sucesso!");
+				setIsLoading(false);
+
 			}
 		} catch (error) {
+			setIsLoading(false);
 			console.error("Erro ao salvar produto:", error);
 			if (error instanceof AxiosError) {
 				console.error("Detalhes do erro:", error.response?.data);
@@ -488,21 +524,30 @@ export function FormularioProduto() {
 					{produtoId ? "Editar Produto" : "Novo Produto"}
 				</h1>
 				<div className="flex gap-2">
-					{produtoId ? "" :
-						<Button
-							variant="outline"
-							onClick={handleReset}
-							disabled={carregandoDadosDoProduto}
-						>
-							<RotateCw className="h-4 w-4 mr-2" />
-							Resetar
-						</Button>}
-					<Button onClick={handleSave} disabled={carregandoDadosDoProduto}>
+					<Link to="/cadastros/produtos">
+						<Button type="button" variant="outline" className="h-10">
+							Cancelar
+						</Button>
+					</Link>
+
+					<Button className="mr-2" onClick={handleSave} disabled={carregandoDadosDoProduto}>
 						{carregandoDadosDoProduto ? (
 							<Loader className="h-4 w-4 mr-2 animate-spin" />
 						) : null}
 						Salvar
 					</Button>
+					{/* <Button onClick={handleSave} disabled={criandoProduto}>
+						{criandoProduto ? (
+							<>
+								<Loader className="animate-spin mr-2 h-4 w-4" />
+								Salvando...
+							</>
+						) : (
+							"Salvar"
+						)}
+					</Button> */}
+
+
 				</div>
 			</div>
 
@@ -533,8 +578,14 @@ export function FormularioProduto() {
 				handlePageChangeCorrida={handlePageChangeCorrida}
 				corridaSelecionada={corridaSelecionada}
 				setCorridaSelecionada={setCorridaSelecionada}
-			/>
 
+				localData={localData}
+				carregandoLocal={carregandoLocal}
+				setSearchLocal={setSearchLocal}
+				searchLocal={searchLocal}
+
+				isLoading={isLoading}
+			/>
 		</div>
 	);
 

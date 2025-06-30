@@ -22,23 +22,23 @@ import {
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { buscarClientes, type ClienteDaListagem } from "@/api/clientes/buscar-clientes";
-import { 
-	Calendar, 
-	Clock, 
-	Phone, 
-	Mail, 
-	MapPin, 
-	User, 
-	Plus, 
-	Edit, 
-	Trash, 
-	FileText, 
+import {
+	Calendar,
+	Clock,
+	Phone,
+	Mail,
+	MapPin,
+	User,
+	Plus,
+	Edit,
+	Trash,
+	FileText,
 	History,
 	MoreHorizontal,
 	ChevronDown
 } from "lucide-react";
-import { format } from "date-fns";
-import { ptBR } from "date-fns/locale";
+
+import dayjs from "dayjs";
 
 export function AtendimentoCliente() {
 	const [clienteSelecionado, setClienteSelecionado] = useState<ClienteDaListagem | null>(null);
@@ -54,10 +54,10 @@ export function AtendimentoCliente() {
 				return await buscarClientes({ page, perPage, search });
 			} catch (error) {
 				console.warn("[AtendimentoCliente] Erro ao buscar clientes, usando dados de fallback:", error);
-				return { 
-					clientes: [], 
-					meta: { page, perPage, total: 0 }, 
-					teste: {} 
+				return {
+					clientes: [],
+					meta: { page, perPage, total: 0 },
+					teste: {}
 				};
 			}
 		},
@@ -103,7 +103,7 @@ export function AtendimentoCliente() {
 						<Trash className="h-4 w-4 mr-2" />
 						Excluir
 					</Button>
-					
+
 					{/* Dropdown com outras opções */}
 					<DropdownMenu>
 						<DropdownMenuTrigger asChild>
@@ -193,9 +193,8 @@ export function AtendimentoCliente() {
 									clientesResponse.clientes.map((cliente) => (
 										<TableRow
 											key={cliente.id}
-											className={`cursor-pointer hover:bg-gray-50 transition-colors ${
-												clienteSelecionado?.id === cliente.id ? "bg-blue-50 border-l-4 border-l-blue-500" : ""
-											}`}
+											className={`cursor-pointer hover:bg-gray-50 transition-colors ${clienteSelecionado?.id === cliente.id ? "bg-blue-50 border-l-4 border-l-blue-500" : ""
+												}`}
 											onClick={() => handleClienteClick(cliente)}
 										>
 											<TableCell className="font-medium">{cliente.id}</TableCell>
@@ -243,7 +242,7 @@ export function AtendimentoCliente() {
 										#{clienteSelecionado.id}
 									</Badge>
 								</div>
-								
+
 								{/* Info rápida */}
 								<div className="grid grid-cols-2 gap-4 text-sm">
 									<div>
@@ -270,7 +269,7 @@ export function AtendimentoCliente() {
 												<label className="text-xs font-medium text-gray-500 uppercase tracking-wide">CNPJ/CPF</label>
 												<p className="text-sm font-mono mt-1">{formatarCNPJ(clienteSelecionado.cnpj) || "Não informado"}</p>
 											</div>
-											
+
 											<div className="grid grid-cols-2 gap-3">
 												<div>
 													<label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Telefone 2</label>
@@ -298,13 +297,13 @@ export function AtendimentoCliente() {
 												<div>
 													<label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Cadastro</label>
 													<p className="text-sm mt-1">
-														{format(new Date(clienteSelecionado.dataCadastro), "dd/MM/yyyy", { locale: ptBR })}
+														{dayjs(new Date(clienteSelecionado.dataCadastro)).format("dd/MM/yyyy")}
 													</p>
 												</div>
 												<div>
 													<label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Atualização</label>
 													<p className="text-sm mt-1">
-														{format(new Date(clienteSelecionado.dataAtual), "dd/MM/yyyy", { locale: ptBR })}
+														{dayjs(new Date(clienteSelecionado.dataAtual)).format("dd/MM/yyyy")}
 													</p>
 												</div>
 											</div>

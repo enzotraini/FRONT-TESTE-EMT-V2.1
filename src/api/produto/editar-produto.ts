@@ -72,7 +72,7 @@ export interface EditarProdutoParams {
   organizacao_id: number;
 }
 
-export async function editarProduto(params: EditarProdutoParams) {
+export async function editarProdutoService(params: EditarProdutoParams) {
   console.log("Iniciando requisição para editar produto:", JSON.stringify(params, null, 2));
 
   try {

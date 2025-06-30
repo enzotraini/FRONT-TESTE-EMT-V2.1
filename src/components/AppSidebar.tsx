@@ -99,7 +99,7 @@ export function AppSidebar() {
 		<Sidebar>
 			<SidebarHeader>
 				<Link to="/" className="uppercase text-blue-700 dark:text-blue-400 p-4 hover:opacity-80 transition-opacity">
-					Comercial <br /> <strong>Aço Fácil</strong>
+					Comercial <br /> <strong>EMT Consultoria</strong>
 				</Link>
 			</SidebarHeader>
 			<SidebarContent>
@@ -406,7 +406,7 @@ export function AppSidebar() {
 										</span>
 									</DropdownMenuSubTrigger>
 									<DropdownMenuSubContent>
-										<DropdownMenuItem 
+										<DropdownMenuItem
 											onSelect={() => {
 												console.log("[AppSidebar] Tentando mudar para tema claro");
 												setTheme("light");
@@ -416,7 +416,7 @@ export function AppSidebar() {
 										>
 											<span>Claro</span>
 										</DropdownMenuItem>
-										<DropdownMenuItem 
+										<DropdownMenuItem
 											onSelect={() => {
 												console.log("[AppSidebar] Tentando mudar para tema escuro");
 												setTheme("dark");
@@ -426,7 +426,7 @@ export function AppSidebar() {
 										>
 											<span>Escuro</span>
 										</DropdownMenuItem>
-										<DropdownMenuItem 
+										<DropdownMenuItem
 											onSelect={() => {
 												console.log("[AppSidebar] Tentando mudar para tema do sistema");
 												setTheme("system");
