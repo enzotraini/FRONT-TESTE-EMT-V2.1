@@ -23,6 +23,9 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { criarVendedor } from "@/api/vendedor/criar-vendedor";
+import { editarVendedor } from "@/api/vendedor/editar-vendedor";
+import { buscarVendedorPorId } from "@/api/vendedor/buscar-vendedor-por-id";
 
 const vendedorFormSchema = z.object({
   nome: z.string().min(1, "Nome é obrigatório").max(40, "Nome deve ter no máximo 40 caracteres"),
@@ -69,13 +72,29 @@ export function FormularioDeVendedor() {
     }
   });
 
-  // Mock mutation para criar vendedor (substituir pela API real)
+  // Mutation para criar vendedor
   const { mutateAsync: criarVendedorFn } = useMutation({
     mutationFn: async (data: VendedorFormData) => {
-      // Mock API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      console.log("Criando vendedor:", data);
-      return data;
+      return await criarVendedor({
+        codigo: Number(data.cgccpf.replace(/\D/g, '').slice(-6)), // Gera código baseado no CPF/CNPJ
+        nome: data.nome,
+        endereco: data.endereco,
+        bairro: data.bairro,
+        cidade: data.cidade,
+        estado: data.estado,
+        cep: data.cep,
+        telefone1: data.telefone || "",
+        telefone2: "",
+        celular1: data.celular1 || "",
+        email: data.email || "",
+        cgccpf: data.cgccpf,
+        inscricaoestadual: data.estadualrg || "",
+        comissao: Number(data.comissao) || 0,
+        observacoes: data.observacoes || "",
+        ativo: true,
+        user_id: 1, // TODO: Pegar do contexto de autenticação
+        organizacao_id: 1, // TODO: Pegar do contexto de autenticação
+      });
     },
     onSuccess: () => {
       toast.success("Vendedor criado com sucesso!");
@@ -88,13 +107,30 @@ export function FormularioDeVendedor() {
     },
   });
 
-  // Mock mutation para editar vendedor (substituir pela API real)
+  // Mutation para editar vendedor
   const { mutateAsync: editarVendedorFn } = useMutation({
     mutationFn: async (data: VendedorFormData) => {
-      // Mock API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      console.log("Editando vendedor:", data);
-      return data;
+      return await editarVendedor({
+        id: Number(vendedorId),
+        codigo: Number(data.cgccpf.replace(/\D/g, '').slice(-6)), // Gera código baseado no CPF/CNPJ
+        nome: data.nome,
+        endereco: data.endereco,
+        bairro: data.bairro,
+        cidade: data.cidade,
+        estado: data.estado,
+        cep: data.cep,
+        telefone1: data.telefone || "",
+        telefone2: "",
+        celular1: data.celular1 || "",
+        email: data.email || "",
+        cgccpf: data.cgccpf,
+        inscricaoestadual: data.estadualrg || "",
+        comissao: Number(data.comissao) || 0,
+        observacoes: data.observacoes || "",
+        ativo: true,
+        user_id: 1, // TODO: Pegar do contexto de autenticação
+        organizacao_id: 1, // TODO: Pegar do contexto de autenticação
+      });
     },
     onSuccess: () => {
       toast.success("Vendedor editado com sucesso!");
@@ -107,35 +143,15 @@ export function FormularioDeVendedor() {
     },
   });
 
-  // Mock query para buscar dados do vendedor (substituir pela API real)
+  // Query para buscar dados do vendedor
   const {
     data: dadosVendedor,
     isFetching: carregandoDados,
   } = useQuery({
     queryKey: ["buscar-vendedor", vendedorId],
     queryFn: async () => {
-      // Mock API call
-      if (vendedorId === "1") {
-        return {
-          dadosGerais: {
-            nome: "João Silva",
-            cgccpf: "123.456.789-00",
-            cep: "01234-567",
-            endereco: "Rua das Flores, 123",
-            bairro: "Centro",
-            cidade: "São Paulo",
-            estado: "SP",
-            telefone: "(11) 1234-5678",
-            celular1: "(11) 99999-9999",
-            celular2: "",
-            comissao: "5.00",
-            estadualrg: "123456789",
-            email: "joao@email.com",
-            observacoes: "Vendedor experiente",
-          }
-        };
-      }
-      return null;
+      if (!vendedorId) return null;
+      return await buscarVendedorPorId(vendedorId);
     },
     enabled: vendedorId !== undefined && vendedorId !== "",
     retry: (retries, error) => {
